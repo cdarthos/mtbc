@@ -24,34 +24,32 @@ class MtbcRandom:
     def __init__(self,
                  select_mycobacterium_canettii=False,
                  select_mycobacterium_mungi=False,
-                 select_mycobacterium_orygis = False,
-                 select_mycobacterium_tuberculosis = False,
+                 select_mycobacterium_orygis=False,
+                 select_mycobacterium_tuberculosis=False,
                  ):
         self.retmax = 1000000
         self.random_number = 10
         Entrez.email = 'A.N.Other@example.com'
         self.select_taxa = {}
-        self.select_taxa["select_mycobacterium_canettii"] = select_mycobacterium_canettii
-        self.select_taxa["select_mycobacterium_mungi"] = select_mycobacterium_mungi
-        self.select_taxa["select_mycobacterium_orygis"] = select_mycobacterium_orygis
-        self.select_taxa["select_mycobacterium_tuberculosis"] = select_mycobacterium_tuberculosis
+        self.select_taxa[self.taxa_mycobacterium_canettii] = select_mycobacterium_canettii
+        self.select_taxa[self.taxa_mycobacterium_mungi] = select_mycobacterium_mungi
+        self.select_taxa[self.taxa_mycobacterium_orygis] = select_mycobacterium_orygis
+        self.select_taxa[self.taxa_mycobacterium_tuberculosis] = select_mycobacterium_tuberculosis
 
     def construct_search_request(self):
 
         if True in self.select_taxa.values():
-            return " OR ".join(key for key, value in self.select_taxa.items() if value)
-
+            request = " OR ".join('txid' + key + '[ORGN]' for key, value in self.select_taxa.items() if value)
+            return request
 
         else:
             request = 'txid' + self.taxa_mycobacterium_tuberculosis_complex + '[ORGN]'
             return request
 
-
-
     def mtbc_random_search_id(self):
         retmax = 1000000
         handle = Entrez.esearch(db="sra",
-                                term=self.taxa_mycobacterium_tuberculosis_complex,
+                                term=self.construct_search_request(),
                                 retmax=retmax,
                                 retstart=0)
         record = Entrez.read(handle)
@@ -90,9 +88,11 @@ class MtbcRandom:
 
 
 if __name__ == "__main__":
-    mtbc = MtbcRandom(select_mycobacterium_canettii=True)
-    #print(mtbc.mtbc_random_search_id()[:10])
-    #print()
-    #print(mtbc.mtbc_random_get_accession_number()).
-    #print()
+    mtbc = MtbcRandom(select_mycobacterium_canettii=True, select_mycobacterium_mungi=True)
     print(mtbc.construct_search_request())
+    print()
+    print(mtbc.mtbc_random_search_id()[:10])
+    print()
+    print(mtbc.mtbc_random_get_accession_number())
+    print()
+
