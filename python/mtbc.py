@@ -30,11 +30,10 @@ class MtbcRandom:
         self.retmax = 1000000
         self.random_number = 10
         Entrez.email = 'A.N.Other@example.com'
-        self.select_taxa = {}
-        self.select_taxa[self.taxa_mycobacterium_canettii] = select_mycobacterium_canettii
-        self.select_taxa[self.taxa_mycobacterium_mungi] = select_mycobacterium_mungi
-        self.select_taxa[self.taxa_mycobacterium_orygis] = select_mycobacterium_orygis
-        self.select_taxa[self.taxa_mycobacterium_tuberculosis] = select_mycobacterium_tuberculosis
+        self.select_taxa = {self.taxa_mycobacterium_canettii: select_mycobacterium_canettii,
+                            self.taxa_mycobacterium_mungi: select_mycobacterium_mungi,
+                            self.taxa_mycobacterium_orygis: select_mycobacterium_orygis,
+                            self.taxa_mycobacterium_tuberculosis: select_mycobacterium_tuberculosis}
 
     def construct_search_request(self):
 
@@ -95,4 +94,3 @@ if __name__ == "__main__":
     print()
     print(mtbc.mtbc_random_get_accession_number())
     print()
-
