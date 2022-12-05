@@ -72,7 +72,6 @@ unittest:
     - python --version  # Print out python version for debugging
     - python3 -m venv venv
     - source venv/bin/activate
-    - pip install unitest
     - pip install -r requirements.txt
   script:
   - python -m unittest python/test_mtbc.py
