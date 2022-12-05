@@ -53,7 +53,6 @@ Build:
 
 flake8:
   stage: Static Analysis
-  when: manual
   before_script:
     - python --version  # Print out python version for debugging
     - python3 -m venv venv
