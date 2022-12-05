@@ -6,28 +6,53 @@ from Bio import Entrez
 
 
 class MtbcRandom:
-    def __init__(self):
+    # Mycobacterium tuberculosis complex 77643
+    taxa_mycobacterium_tuberculosis_complex = '77643'
+
+    # Mycobacterium canettii 78331
+    taxa_mycobacterium_canettii = '78331'
+
+    # Mycobacterium mungi 1844474
+    taxa_mycobacterium_mungi = '1844474'
+
+    # Mycobacterium orygis 1305738
+    taxa_mycobacterium_orygis = '1305738'
+
+    # Mycobacterium tuberculosis 1773
+    taxa_mycobacterium_tuberculosis = '1773'
+
+    def __init__(self,
+                 select_mycobacterium_canettii=False,
+                 select_mycobacterium_mungi=False,
+                 select_mycobacterium_orygis = False,
+                 select_mycobacterium_tuberculosis = False,
+                 ):
         self.retmax = 1000000
         self.random_number = 10
         Entrez.email = 'A.N.Other@example.com'
+        self.select_taxa = {}
+        self.select_taxa["select_mycobacterium_canettii"] = select_mycobacterium_canettii
+        self.select_taxa["select_mycobacterium_mungi"] = select_mycobacterium_mungi
+        self.select_taxa["select_mycobacterium_orygis"] = select_mycobacterium_orygis
+        self.select_taxa["select_mycobacterium_tuberculosis"] = select_mycobacterium_tuberculosis
 
-        #Mycobacterium tuberculosis complex 77643
-        self.taxa_tuberculosis_complex = 'txid77643[ORGN]'
+    def construct_search_request(self):
 
-        #Mycobacterium canettii 78331
-        self.taxa_tuberculosis_canettii = 'txid78331[ORGN]'
+        if True in self.select_taxa.values():
+            return " OR ".join(key for key, value in self.select_taxa.items() if value)
 
-        #Mycobacterium orygis 1305738
-        self.taxa_tuberculosis_orygis = 'txid1305738[ORGN]'
 
-        #Mycobacterium tuberculosis 1773
-        self.taxa_tuberculosis_tuberculosis = 'txid1773[ORGN]'
+        else:
+            request = 'txid' + self.taxa_mycobacterium_tuberculosis_complex + '[ORGN]'
+            return request
+
 
 
     def mtbc_random_search_id(self):
+        retmax = 1000000
         handle = Entrez.esearch(db="sra",
-                                term=self.taxa_tuberculosis_complex,
-                                retmax=self.retmax,
+                                term=self.taxa_mycobacterium_tuberculosis_complex,
+                                retmax=retmax,
                                 retstart=0)
         record = Entrez.read(handle)
         handle.close()
@@ -65,7 +90,9 @@ class MtbcRandom:
 
 
 if __name__ == "__main__":
-    mtbc = MtbcRandom()
-    print(mtbc.mtbc_random_search_id()[:10])
-    print()
-    print(mtbc.mtbc_random_get_accession_number())
+    mtbc = MtbcRandom(select_mycobacterium_canettii=True)
+    #print(mtbc.mtbc_random_search_id()[:10])
+    #print()
+    #print(mtbc.mtbc_random_get_accession_number()).
+    #print()
+    print(mtbc.construct_search_request())
