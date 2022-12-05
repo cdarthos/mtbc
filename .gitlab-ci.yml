@@ -54,7 +54,6 @@ Build:
 
 flake8:
   when: manual
-  image: python
   stage: Static Analysis
   before_script:
     - python --version  # Print out python version for debugging
