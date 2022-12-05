@@ -53,6 +53,7 @@ Build:
 
 
 flake8:
+  when: manual
   image: python
   stage: Static Analysis
   before_script:
@@ -65,6 +66,7 @@ flake8:
   - flake8  --max-line-length=150 python/*.py
 
 unittest:
+  when: manual
   stage: Test
   before_script:
     - python --version  # Print out python version for debugging
