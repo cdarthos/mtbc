@@ -10,11 +10,23 @@ class MtbcRandom:
         self.retmax = 1000000
         self.random_number = 10
         Entrez.email = 'A.N.Other@example.com'
-        self.base_taxa = 'txid77643[ORGN]'
+
+        #Mycobacterium tuberculosis complex 77643
+        self.taxa_tuberculosis_complex = 'txid77643[ORGN]'
+
+        #Mycobacterium canettii 78331
+        self.taxa_tuberculosis_canettii = 'txid78331[ORGN]'
+
+        #Mycobacterium orygis 1305738
+        self.taxa_tuberculosis_orygis = 'txid1305738[ORGN]'
+
+        #Mycobacterium tuberculosis 1773
+        self.taxa_tuberculosis_tuberculosis = 'txid1773[ORGN]'
+
 
     def mtbc_random_search_id(self):
         handle = Entrez.esearch(db="sra",
-                                term=self.base_taxa,
+                                term=self.taxa_tuberculosis_complex,
                                 retmax=self.retmax,
                                 retstart=0)
         record = Entrez.read(handle)
