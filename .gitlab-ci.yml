@@ -74,8 +74,8 @@ unittest:
     - source venv/bin/activate
     - pip install -r requirements.txt
   script:
-  - python -m unittest python/test_mtbc.py
-
+  - cd python && python -m unittest test_mtbc.TestMtbcRandom
+  
 deploy_by_ssh:
   stage: Deploy
   when: manual
