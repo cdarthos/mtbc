@@ -5,19 +5,17 @@ import xmltodict
 from Bio import Entrez
 
 
-class Mtbc_random:
+class MtbcRandom:
     def __init__(self):
         self.retmax = 1000000
         self.random_number = 10
         Entrez.email = 'A.N.Other@example.com'
         self.base_taxa = 'txid77643[ORGN]'
 
-
     def mtbc_random_search_id(self):
-
         handle = Entrez.esearch(db="sra",
                                 term=self.base_taxa,
-                                retmax= self.retmax,
+                                retmax=self.retmax,
                                 retstart=0)
         record = Entrez.read(handle)
         handle.close()
@@ -55,8 +53,7 @@ class Mtbc_random:
 
 
 if __name__ == "__main__":
-    mtbc = Mtbc_random()
+    mtbc = MtbcRandom()
     print(mtbc.mtbc_random_search_id()[:10])
     print()
     print(mtbc.mtbc_random_get_accession_number())
-
