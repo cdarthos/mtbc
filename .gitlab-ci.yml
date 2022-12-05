@@ -1,21 +1,23 @@
-# This file is a template, and might need editing before it works on your project.
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
 
-# Official language image. Look for the different tagged releases at:
+# Tagged releases of Python docker images can be found at:
 # https://hub.docker.com/r/library/python/tags/
+#image: docker:20.10.10
 
-image: python:latest
+#services:
+#  - docker:20.10.10-dind
 
 # Change pip's cache directory to be inside the project directory since we can
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  CI_REGISTRY_IMAGE: "crispr"
+  CI_REGISTRY_PASSWORD: "Azerty4221"
+  CI_REGISTRY_USER: "root"
+  CI_REGISTRY_ALT: "darthos.freeboxos.fr:5050"
+  DOCKER_TLS_CERTDIR: "/certs"
 
 # Pip's cache doesn't store the python packages
-# https://pip.pypa.io/en/stable/topics/caching/
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
 #
 # If you want to also cache the installed packages, you have to install
 # them in a virtualenv and cache it as well.
@@ -24,41 +26,59 @@ cache:
     - .cache/pip
     - venv/
 
-before_script:
-  - python --version  # For debugging
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
 
-test:
+
+stages:
+
+  - build
+  - Static Analysis
+  - Deploy
+
+flake8:
+  stage: Static Analysis
+  when: manual
+  before_script:
+    - python --version  # Print out python version for debugging
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install -r python/requirements.txt
   script:
-    - python setup.py test
-    - pip install tox flake8  # you can also use tox
-    - tox -e py36,flake8
+  - flake8  --max-line-length=150 python/*.py
 
-run:
+deploy_by_ssh:
+  stage: Deploy
+  when: manual
+  before_script:
+  - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' 
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan 192.168.1.44 >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
   script:
-    - python setup.py bdist_wheel
-    # an alternative approach is to install and run:
-    - pip install dist/*
-    # run the command here
-  artifacts:
-    paths:
-      - dist/*.whl
+  - ssh clement@192.168.1.44 "sudo yum install -y git"
+  - ssh clement@192.168.1.44 "git clone http://docker:glpat-AoGukNAbwR29Lnw441Uv@darthos.freeboxos.fr/gitlab/gitlab-instance-15e1ca69/cicd_tutorial.git && cd cicd_tutorial || cd cicd_tutorial && git reset --hard HEAD && git pull http://docker:glpat-AoGukNAbwR29Lnw441Uv@darthos.freeboxos.fr/gitlab/gitlab-instance-15e1ca69/cicd_tutorial.git; "
+  - ssh clement@192.168.1.44 "podman restart crispr"
+  #- ssh clement@192.168.1.44 "podman rm --force crispr  || echo 'no container crispr'"
+  #- ssh clement@192.168.1.44 "podman image rm localhost/crispr:latest || echo 'no image crispr'"
+  #- ssh clement@192.168.1.44 "podman build  --tag crispr cicd_tutorial/python/"
+  #- ssh clement@192.168.1.44 "podman login darthos.freeboxos.fr:5050 -u root -p Azerty4221 && podman run -p 5000:5000  -v "./cicd_tutorial/python:/app:Z,U"    -d   --name crispr    darthos.freeboxos.fr:5050/gitlab-instance-15e1ca69/cicd_tutorial/flask:latest"
 
-pages:
+
+
+Build:
+  stage: build
+  when: manual
+  before_script:
+    - docker info
   script:
-    - pip install sphinx sphinx-rtd-theme
-    - cd doc
-    - make html
-    - mv build/html/ ../public/
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-deploy:
-  stage: deploy
-  script: echo "Define your deployment script!"
-  environment: production
+    - docker login darthos.freeboxos.fr:5050 -u root -p Azerty4221
+    # fetches the latest image (not failing if image is not found)
+    #- docker pull $CI_REGISTRY_IMAGE:latest || true
+    # builds the project, passing proxy variables, using OCI labels
+    # notice the cache-from, which is going to use the image we just pulled locally
+    # the built image is tagged locally with the commit SHA, and then pushed to 
+    # the GitLab registr
+    - docker build -t darthos.freeboxos.fr:5050/gitlab-instance-15e1ca69/cicd_tutorial/flask:latest python/
+    - docker push darthos.freeboxos.fr:5050/gitlab-instance-15e1ca69/cicd_tutorial/flask:latest
