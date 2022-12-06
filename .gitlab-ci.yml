@@ -35,22 +35,6 @@ stages:
   - Test
   - Deploy
 
-Build:
-  stage: build
-  when: manual
-  before_script:
-    - docker info
-  script:
-    - docker login darthos.freeboxos.fr:5050 -u root -p Azerty4221
-    # fetches the latest image (not failing if image is not found)
-    #- docker pull $CI_REGISTRY_IMAGE:latest || true
-    # builds the project, passing proxy variables, using OCI labels
-    # notice the cache-from, which is going to use the image we just pulled locally
-    # the built image is tagged locally with the commit SHA, and then pushed to 
-    # the GitLab registr
-    - docker build -t darthos.freeboxos.fr:5050/gitlab-instance-15e1ca69/cicd_tutorial/flask:latest python/
-    - docker push darthos.freeboxos.fr:5050/gitlab-instance-15e1ca69/cicd_tutorial/flask:latest
-
 
 flake8:
   when: manual
