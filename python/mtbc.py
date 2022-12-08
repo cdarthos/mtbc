@@ -26,7 +26,7 @@ class MtbcRandom:
     # Mycobacterium tuberculosis 1773
     taxa_mycobacterium_tuberculosis = '1773'
 
-    sequence = {'NC_000962.3': {}}
+    sequence_dict = {'NC_000962.3': {}}
     alignement = {}
 
     def __init__(self,
@@ -35,18 +35,14 @@ class MtbcRandom:
                  select_mycobacterium_orygis=False,
                  select_mycobacterium_tuberculosis=False,
                  retmax=10000000,
-                 list_length=100,
+                 list_length=200,
                  debug=False):
-        """
-        @param retmax:
-        @param list_length:
-        @param select_mycobacterium_canettii:
-        @param select_mycobacterium_mungi:
-        @param select_mycobacterium_orygis:
-        @param select_mycobacterium_tuberculosis:
-        """
 
-        self.align = None
+        self.acc_list = None
+        self.sample_list = None
+        self.ncbi_all_id = None
+        self.ncbi_request_all_id = None
+        self.align_with_alignIO = None
         self.df_mutation = None
         self.debug = debug
         self.retmax = retmax
@@ -56,62 +52,65 @@ class MtbcRandom:
                             self.taxa_mycobacterium_mungi: select_mycobacterium_mungi,
                             self.taxa_mycobacterium_orygis: select_mycobacterium_orygis,
                             self.taxa_mycobacterium_tuberculosis: select_mycobacterium_tuberculosis}
-        self.req = self.construct_search_request()
-        self.id_list = self.get_all_id()
-        self.acc_list = self.mtbc_random_get_accession_number()
-        self.request()
-        # if debug:
-        #    print(json.dumps(self.sequence,indent=4))
-        #    print(self.sequence.keys())
-        self.reconstruct_sequence()
+        self.construct_search_request()
+        if self.debug:
+            print("self.ncbi_request_all_id")
+            print(self.ncbi_request_all_id)
+        self.get_all_id()
+        if self.debug:
+            print("self.ncbi_all_id")
+            print(self.ncbi_all_id)
+        self.select_random_ncbi_id_number()
+        if self.debug:
+            print("self.sample_list")
+            print(self.sample_list)
+        self.get_acc_number_from_ncbi_id()
+        if self.debug:
+            print("self.acc_list")
+            print(self.acc_list)
+        self.mtbc_request()
+        if self.debug:
+            print("self.sequence")
+            print(self.sequence_dict)
+        self.reconstruct_sequence_to_fasta_file()
         self.align_reconstruct()
+        if self.debug:
+            print("self.align_with_alignIO")
+            print(self.align_with_alignIO)
         self.create_nj_tree()
 
     def construct_search_request(self):
         if True in self.select_taxa.values():
-            request = " OR ".join('txid' + key + '[ORGN]' for key, value in self.select_taxa.items() if value)
-            if self.debug:
-                print(request)
-            return request
+            self.ncbi_request_all_id = " OR ".join(
+                'txid' + key + '[ORGN]' for key, value in self.select_taxa.items() if value)
 
         else:
-            request = 'txid' + self.taxa_mycobacterium_tuberculosis_complex + '[ORGN]'
-            if self.debug:
-                print(request)
-            return request
+            self.ncbi_request_all_id = 'txid' + self.taxa_mycobacterium_tuberculosis_complex + '[ORGN]'
 
     def get_all_id(self):
         retmax = 1000000
         handle = Entrez.esearch(db="sra",
-                                term=self.req,
+                                term=self.ncbi_request_all_id,
                                 retmax=retmax,
                                 retstart=0)
         record = Entrez.read(handle)
         if self.debug:
+            print("Entrez.esearch")
             print(record)
         handle.close()
+        self.ncbi_all_id = record['IdList']
 
-        return record['IdList']
+    def select_random_ncbi_id_number(self):
+        self.sample_list = random.choices(self.ncbi_all_id,
+                                          k=self.list_length)
 
-    def mtbc_random_get_accession_number(self):
-        id_list = self.id_list
-        sample_list = random.choices(id_list,
-                                     k=self.list_length)
-
-        handle_epost = Entrez.epost(db="sra",
-                                    id=",".join(map(str, sample_list)),
-                                    retmax=self.retmax)
-        record_epost = Entrez.read(handle_epost)
-        if self.debug:
-            print(record_epost)
-        handle_epost.close()
-
+    def get_acc_number_from_ncbi_id(self):
         handle_esummary = Entrez.esummary(db="sra",
-                                          webenv=record_epost['WebEnv'],
-                                          query_key=record_epost['QueryKey'],
-                                          retmax=self.retmax)
+                                          id=",".join(map(str, self.sample_list))
+                                          )
         record_esummary = Entrez.read(handle_esummary)
         if self.debug:
+            print("record_esummary")
             print(record_esummary)
         handle_esummary.close()
 
@@ -124,10 +123,9 @@ class MtbcRandom:
         runs_acc = list(map(xmltodict.parse, runs_1))
 
         acc_list = pd.json_normalize(runs_acc)['root.Run.@acc']
-        return acc_list.to_list()
+        self.acc_list = acc_list.to_list()
 
-    def request(self):
-        result_alignement = {}
+    def mtbc_request(self):
         for sra in self.acc_list:
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
@@ -141,27 +139,22 @@ class MtbcRandom:
             r = requests.post(url, parameters, head)
 
             if len(r.text) != 0:
-                self.sequence[r.text[1:].split("\n")[0]] = {}
+                self.sequence_dict[r.text[1:].split("\n")[0]] = {}
                 for diff in r.text.split("\n")[2:]:
                     if len(diff) != 0:
                         ###############
                         # premiere etape, on selectionne juste les mutations (pas d'indels/insertion)
                         ###############
                         if len(diff.split(":")[3]) == 1:
-                            self.sequence['NC_000962.3'][diff.split(":")[1]] = diff.split(":")[2]
-                            self.sequence[r.text[1:].split("\n")[0]][diff.split(":")[1]] = diff.split(":")[3]
-                key = r.text[1:].split("\n")[0]
-                value = r.text[1:].split("\n")[1]
-                result_alignement[key] = [len(value), value]
+                            self.sequence_dict['NC_000962.3'][diff.split(":")[1]] = diff.split(":")[2]
+                            self.sequence_dict[r.text[1:].split("\n")[0]][diff.split(":")[1]] = diff.split(":")[3]
 
-        return result_alignement
-
-    def reconstruct_sequence(self):
-        df_mutation = pandas.DataFrame.from_dict(self.sequence)
+    def reconstruct_sequence_to_fasta_file(self):
+        df_mutation = pandas.DataFrame.from_dict(self.sequence_dict)
         df_ref = pandas.Series(df_mutation['NC_000962.3'])
         if self.debug:
             print(df_mutation)
-        with open('alignement/alignement.fasta', 'w') as writer:
+        with open('alignement/reconstruct_sequence.fasta', 'w') as writer:
             for column in df_mutation.columns:
                 df_mutation[column] = df_mutation[column].fillna(df_ref, axis=0)
                 print(">" + column)
@@ -170,16 +163,16 @@ class MtbcRandom:
                 writer.writelines("".join(df_mutation[column].to_list()) + "\n")
 
     def align_reconstruct(self):
-        self.align = AlignIO.read('alignement/alignement.fasta', 'fasta')
-        if self.debug:
-            print(self.align)
+        self.align_with_alignIO = AlignIO.read('alignement/reconstruct_sequence.fasta', 'fasta')
+
 
     def create_nj_tree(self):
         calculator = DistanceCalculator('identity')
-        dist_matrix = calculator.get_distance(self.align)
+        dist_matrix = calculator.get_distance(self.align_with_alignIO)
         constructor = DistanceTreeConstructor()
         nj_tree = constructor.nj(dist_matrix)
         Phylo.write(nj_tree, "tree/tree1.nwk", "newick")
+        Phylo.draw_ascii(nj_tree)
 
 
 if __name__ == "__main__":
