@@ -157,8 +157,9 @@ class MtbcRandom:
         with open('alignement/reconstruct_sequence.fasta', 'w') as writer:
             for column in df_mutation.columns:
                 df_mutation[column] = df_mutation[column].fillna(df_ref, axis=0)
-                print(">" + column)
-                print("".join(df_mutation[column].to_list()))
+                if self.debug:
+                    print(">" + column)
+                    print("".join(df_mutation[column].to_list()))
                 writer.writelines(">" + column + "\n")
                 writer.writelines("".join(df_mutation[column].to_list()) + "\n")
 
@@ -172,7 +173,8 @@ class MtbcRandom:
         constructor = DistanceTreeConstructor()
         nj_tree = constructor.nj(dist_matrix)
         Phylo.write(nj_tree, "tree/tree1.nwk", "newick")
-        Phylo.draw_ascii(nj_tree)
+        if self.debug:
+            Phylo.draw_ascii(nj_tree)
 
 
 if __name__ == "__main__":
