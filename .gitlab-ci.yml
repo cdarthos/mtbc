@@ -29,15 +29,13 @@ cache:
 
 
 stages:
-
-  - build
   - Static Analysis
   - Test
-  - Deploy
+
 
 
 flake8:
-  when: manual
+  #when: manual
   stage: Static Analysis
   before_script:
     - python --version  # Print out python version for debugging
@@ -49,7 +47,7 @@ flake8:
   - flake8  --max-line-length=150 python/*.py
 
 unittest:
-  when: manual
+  #when: manual
   stage: Test
   before_script:
     - python --version  # Print out python version for debugging
@@ -59,40 +57,7 @@ unittest:
   script:
   - cd python && python -m unittest -v test_mtbc.TestMtbcRandom
   
-deploy_by_ssh:
-  stage: Deploy
-  when: manual
-  before_script:
-  - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' 
-  - eval $(ssh-agent -s)
-  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-  - ssh-keyscan 192.168.1.44 >> ~/.ssh/known_hosts
-  - chmod 644 ~/.ssh/known_hosts
-  script:
-  - ssh clement@192.168.1.44 "sudo yum install -y git"
-  - ssh clement@192.168.1.44 "git clone http://docker:glpat-AoGukNAbwR29Lnw441Uv@darthos.freeboxos.fr/gitlab/gitlab-instance-15e1ca69/cicd_tutorial.git && cd cicd_tutorial || cd cicd_tutorial && git reset --hard HEAD && git pull http://docker:glpat-AoGukNAbwR29Lnw441Uv@darthos.freeboxos.fr/gitlab/gitlab-instance-15e1ca69/cicd_tutorial.git; "
-  - ssh clement@192.168.1.44 "podman restart crispr"
-  #- ssh clement@192.168.1.44 "podman rm --force crispr  || echo 'no container crispr'"
-  #- ssh clement@192.168.1.44 "podman image rm localhost/crispr:latest || echo 'no image crispr'"
-  #- ssh clement@192.168.1.44 "podman build  --tag crispr cicd_tutorial/python/"
-  #- ssh clement@192.168.1.44 "podman login darthos.freeboxos.fr:5050 -u root -p Azerty4221 && podman run -p 5000:5000  -v "./cicd_tutorial/python:/app:Z,U"    -d   --name crispr    darthos.freeboxos.fr:5050/gitlab-instance-15e1ca69/cicd_tutorial/flask:latest"
 
 
 
-Build:
-  stage: build
-  when: manual
-  before_script:
-    - docker info
-  script:
-    - docker login darthos.freeboxos.fr:5050 -u root -p Azerty4221
-    # fetches the latest image (not failing if image is not found)
-    #- docker pull $CI_REGISTRY_IMAGE:latest || true
-    # builds the project, passing proxy variables, using OCI labels
-    # notice the cache-from, which is going to use the image we just pulled locally
-    # the built image is tagged locally with the commit SHA, and then pushed to 
-    # the GitLab registr
-    - docker build -t darthos.freeboxos.fr:5050/gitlab-instance-15e1ca69/cicd_tutorial/flask:latest python/
-    - docker push darthos.freeboxos.fr:5050/gitlab-instance-15e1ca69/cicd_tutorial/flask:latest
+
