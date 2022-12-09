@@ -11,8 +11,8 @@ def hello_world():
 
 @app.route("/mtbc")
 def flask_mtbc():
-    tree = MtbcRandom()
-    return tree.nj_tree
+    tree = MtbcRandom(debug=True, list_length=30)
+    return "<p>OK</p>"
 
 if __name__ == "__main__":
     mtbc = MtbcRandom(debug=True, list_length=30)
