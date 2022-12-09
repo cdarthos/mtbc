@@ -10,17 +10,9 @@ def hello_world():
 
 
 @app.route("/mtbc")
-def mtbc():
-    tree = mtbc.MtbcRandom(debug=True, list_length=30)
+def flask_mtbc():
+    tree = MtbcRandom()
     return tree.nj_tree
 
 if __name__ == "__main__":
-    test = MtbcRandom(debug=True, list_length=30)
-    # print(mtbc.construct_search_request())
-    # print()
-    # print(mtbc.id_list[:10])
-    # print()
-    # print(mtbc.acc_list)
-    # print()
-    # print(json.dumps(mtbc.alignement, indent=4))
-
+    mtbc = MtbcRandom(debug=True, list_length=30)

@@ -201,4 +201,5 @@ class MtbcRandom:
             self.nj_tree = Phylo.draw_ascii(nj_tree)
 
 
-
+if __name__ == "__main__":
+    mtbc = MtbcRandom(debug=True, list_length=30)
