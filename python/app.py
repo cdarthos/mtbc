@@ -8,10 +8,10 @@ app = flask.Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    return """<form method="POST">
+    return """<form action="/mtbc" method="POST">
   <div>
-    <label for="say">What greeting do you want to say?</label>
-    <input name="say" id="say" value="Hi" />
+    <label for="debug">Degug?</label>
+    <input name="debug" id="debug" value="True" />
   </div>
   <div>
     <label for="to">Who do you want to say it to?</label>
@@ -24,9 +24,9 @@ def hello_world():
 """
 
 
-@app.route("/mtbc")
+@app.route("/mtbc", methods=['GET', 'POST'])
 def flask_mtbc():
-    tree = MtbcRandom(debug=True, list_length=30)
+    tree = MtbcRandom(debug=request.form['debug'], list_length=say=request.form['to'])
 
     return os.listdir('tree')
 

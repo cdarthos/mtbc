@@ -1,3 +1,4 @@
 /python/alignement/reconstruct_sequence.fasta
 /python/tree/tree1.nwk
 /python/alignement/*.fasta
+/python/tree/*.nwk
