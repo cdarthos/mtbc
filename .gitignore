@@ -1,3 +1,5 @@
 /venv/
 /python/epost.dtd
 /.idea/other.xml
+/.idea/deployment.xml
+/hs_err_pid16000.log
