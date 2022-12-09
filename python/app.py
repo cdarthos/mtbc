@@ -10,12 +10,12 @@ app = Flask(__name__)
 def hello_world():
     return """<form action="/mtbc" method="POST">
   <div>
-    <label for="debug">Degug?</label>
-    <input name="debug" id="debug" value="True" />
+    <label for="debug">Debug?</label>
+    <input name="debug" id="debug" value="True" type="checkbox" />
   </div>
   <div>
-    <label for="to">Who do you want to say it to?</label>
-    <input name="to" id="to" value="Mom" />
+    <label for="size">list size</label>
+    <input name="size" id="size" value="30" />
   </div>
   <div>
     <button>Send my greetings</button>
@@ -26,7 +26,10 @@ def hello_world():
 
 @app.route("/mtbc", methods=['GET', 'POST'])
 def flask_mtbc():
-    tree = MtbcRandom(debug=request.form['debug'], list_length=int(request.form['to']))
+    debug = False
+    if bool(request.form['debug']):
+        debug = True
+    tree = MtbcRandom(debug=debug, list_length=int(request.form['size']))
 
     return os.listdir('tree')
 

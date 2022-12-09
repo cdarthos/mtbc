@@ -59,7 +59,7 @@ class MtbcRandom:
         self.align_with_alignIO = None
         self.df_mutation = None
 
-        self.id = str(random.random()) + "_" + str(list_length)
+        self.id = str(random.randint(1,1000)) + "_" + str(list_length)
 
         # main program
         self.construct_search_request()
