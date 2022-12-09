@@ -18,7 +18,7 @@ def hello_world():
     <input name="size" id="size" value="30" />
   </div>
   <div>
-    <button>Send my greetings</button>
+    <button>go</button>
   </div>
 </form>
 """
@@ -26,10 +26,10 @@ def hello_world():
 
 @app.route("/mtbc", methods=['GET', 'POST'])
 def flask_mtbc():
-    print(request.form['debug'])
     debug = False
-    if bool(request.form['debug']):
+    if request.form.get('debug'):
         debug = True
+
     print("debug")
     print(debug)
     print(type(debug))
