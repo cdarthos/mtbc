@@ -29,6 +29,9 @@ def flask_mtbc():
     debug = False
     if bool(request.form['debug']):
         debug = True
+    print("debug")
+    print(debug)
+    print(type(debug))
     tree = MtbcRandom(debug=debug, list_length=int(request.form['size']))
 
     return os.listdir('tree')

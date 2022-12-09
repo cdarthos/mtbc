@@ -65,11 +65,11 @@ class MtbcRandom:
         self.construct_search_request()
         if self.debug:
             print("self.ncbi_request_all_id")
-            print(self.ncbi_request_all_id[:10])
+            #print(self.ncbi_request_all_id[:10])
         self.get_all_id()
         if self.debug:
             print("self.ncbi_all_id")
-            print(self.ncbi_all_id[:10])
+            #print(self.ncbi_all_id[:10])
         self.select_random_ncbi_id_number()
         if self.debug:
             print("self.sample_list")
@@ -106,7 +106,7 @@ class MtbcRandom:
         record = Entrez.read(handle)
         if self.debug:
             print("Entrez.esearch")
-            print(record)
+            #print(record)
         handle.close()
         self.ncbi_all_id = record['IdList']
 
@@ -121,7 +121,7 @@ class MtbcRandom:
         record_esummary = Entrez.read(handle_esummary)
         if self.debug:
             print("record_esummary")
-            print(record_esummary)
+            #print(record_esummary)
         handle_esummary.close()
 
         runs = list(map(itemgetter('Runs'),
