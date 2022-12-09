@@ -6,7 +6,7 @@ from mtbc import MtbcRandom
 app = Flask(__name__)
 
 
-@app.route("/mtbc", methods='GET')
+@app.route("/mtbc", methods=['GET'])
 def hello_world():
     return """<form action="/mtbc" method="POST">
   <div>
@@ -24,7 +24,7 @@ def hello_world():
 """
 
 
-@app.route("/mtbc", methods='POST')
+@app.route("/mtbc", methods=['POST'])
 def flask_mtbc():
     debug = False
     if request.form.get('debug'):
