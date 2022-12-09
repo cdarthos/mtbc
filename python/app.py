@@ -26,7 +26,7 @@ def hello_world():
 
 @app.route("/mtbc", methods=['GET', 'POST'])
 def flask_mtbc():
-    tree = MtbcRandom(debug=request.form['debug'], list_length=say=request.form['to'])
+    tree = MtbcRandom(debug=request.form['debug'], list_length=request.form['to'])
 
     return os.listdir('tree')
 
