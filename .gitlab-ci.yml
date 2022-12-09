@@ -10,7 +10,7 @@
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  CI_REGISTRY_IMAGE: "mtbc"
+  CI_REGISTRY_IMAGE: "mtbc_package"
   CI_REGISTRY_PASSWORD: "Azerty4221"
   CI_REGISTRY_USER: "root"
   CI_REGISTRY_ALT: "darthos.freeboxos.fr:5050"
@@ -65,12 +65,9 @@ deploy_by_ssh:
   before_script:
   - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
   - eval $(ssh-agent -s)
-  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
   - ssh-keyscan 192.168.1.198 >> ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
   script:
   - ssh root@192.168.1.198 "apt-get install -y git"
-  - ssh root@192.168.1.198 "cd mtbc && git pull https://root:Azerty4221@darthos.freeboxos.fr/gitlab/gitlab-instance-15e1ca69/mtbc.git"
-  - ssh root@192.168.1.198 "cd mtbc && pip3 install -r requirements.txt"
+  - ssh root@192.168.1.198 "cd mtbc_package && git pull https://root:Azerty4221@darthos.freeboxos.fr/gitlab/gitlab-instance-15e1ca69/mtbc_package.git"
+  - ssh root@192.168.1.198 "cd mtbc_package && pip3 install -r requirements.txt"

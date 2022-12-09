@@ -81,6 +81,7 @@ class MtbcGetRandomSRA:
         if self.debug:
             print("self.acc_list")
             print(self.ncbi_random_id_list)
+        print(len(self.ncbi_random_id_list))
 
     def construct_search_request(self):
         if True in self.select_taxa.values():
@@ -151,6 +152,6 @@ class MtbcGetRandomSRA:
 
 
 if __name__ == "__main__":
-    mtbc = MtbcGetRandomSRA(debug=False, list_length=100, id1=3)
-    print(mtbc.to_json())
+    mtbc_inst1 = MtbcGetRandomSRA(debug=False, list_length=100000000, id1=3)
+    #print(mtbc.to_json())
 

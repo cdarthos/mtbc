@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route("/mtbc", methods=['GET'])
 def hello_world():
-    return """<form action="/mtbc" method="POST">
+    return """<form action="/mtbc_package" method="POST">
   <div>
     <label for="debug">Debug?</label>
     <input name="debug" id="debug" value="True" type="checkbox" />

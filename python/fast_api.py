@@ -10,9 +10,9 @@ async def root():
     return {"message": "Hello test"}
 
 
-@test.get("mtbc_package")
-async def set_param():
-    mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(debug=False)
+@test.get("/mtbc")
+async def set_param(debug: bool = True):
+    mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(debug=debug)
     return mtbc_inst.to_json()
 
 
