@@ -8,6 +8,7 @@ import xmltodict
 from Bio import Entrez
 from Bio import Phylo, AlignIO
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
+from pandas.api.types import CategoricalDtype
 
 
 class MtbcRandom:
@@ -164,7 +165,11 @@ class MtbcRandom:
 
     def reconstruct_sequence_to_fasta_file(self):
 
-        df_mutation = pandas.DataFrame.from_dict(self.sequence_dict, dtype='category')
+        cat_type = CategoricalDtype(categories=list("ATCG"))
+
+        df_mutation = pandas.DataFrame.from_dict(self.sequence_dict, dtype=cat_type)
+
+
 
         df_ref = pandas.Series(df_mutation['NC_000962.3'])
 
@@ -174,7 +179,7 @@ class MtbcRandom:
 
         with open('alignement/reconstruct_sequence.fasta', 'w') as writer:
             for column in df_mutation.columns:
-                df_mutation[column] = df_mutation[column].fillna(df_ref, axis=0)
+                df_mutation[column] = df_mutation[column].fillna(df_mutation['NC_000962.3'], axis=0)
                 writer.writelines(">" + column + "\n")
                 writer.writelines("".join(df_mutation[column].to_list()) + "\n")
 
@@ -196,7 +201,7 @@ class MtbcRandom:
 
 
 if __name__ == "__main__":
-    mtbc = MtbcRandom(debug=True, list_length=1000)
+    mtbc = MtbcRandom(debug=True, list_length=30)
     # print(mtbc.construct_search_request())
     # print()
     # print(mtbc.id_list[:10])
