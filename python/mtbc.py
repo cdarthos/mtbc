@@ -51,6 +51,7 @@ class MtbcRandom:
                             self.taxa_mycobacterium_tuberculosis: select_mycobacterium_tuberculosis}
 
         # initialize empty variable
+        self.nj_tree = None
         self.acc_list = None
         self.sample_list = None
         self.ncbi_all_id = None
@@ -197,7 +198,8 @@ class MtbcRandom:
         Phylo.write(nj_tree, "tree/tree1.nwk", "newick")
         if self.debug:
             print("Phylo.draw_ascii(nj_tree)")
-            Phylo.draw_ascii(nj_tree)
+            self.nj_tree = Phylo.draw_ascii(nj_tree)
+
 
 
 if __name__ == "__main__":
