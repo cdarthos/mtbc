@@ -59,6 +59,8 @@ class MtbcRandom:
         self.align_with_alignIO = None
         self.df_mutation = None
 
+        self.id = str(random.random()) + "_" + str(list_length)
+
         # main program
         self.construct_search_request()
         if self.debug:
@@ -170,22 +172,18 @@ class MtbcRandom:
 
         df_mutation = pandas.DataFrame.from_dict(self.sequence_dict, dtype=cat_type)
 
-
-
-        df_ref = pandas.Series(df_mutation['NC_000962.3'])
-
         if self.debug:
             print(df_mutation.info(memory_usage="deep"))
             print(df_mutation.astype('category').info(memory_usage="deep"))
 
-        with open('alignement/reconstruct_sequence.fasta', 'w') as writer:
+        with open('alignement/{0}.fasta'.format(self.id), 'w') as writer:
             for column in df_mutation.columns:
                 df_mutation[column] = df_mutation[column].fillna(df_mutation['NC_000962.3'], axis=0)
                 writer.writelines(">" + column + "\n")
                 writer.writelines("".join(df_mutation[column].to_list()) + "\n")
 
     def align_reconstruct(self):
-        self.align_with_alignIO = AlignIO.read('alignement/reconstruct_sequence.fasta', 'fasta')
+        self.align_with_alignIO = AlignIO.read('alignement/{0}.fasta'.format(self.id), 'fasta')
 
     def create_nj_tree(self):
         calculator = DistanceCalculator('identity')
@@ -195,10 +193,10 @@ class MtbcRandom:
             print(dist_matrix)
         constructor = DistanceTreeConstructor()
         nj_tree = constructor.nj(dist_matrix)
-        Phylo.write(nj_tree, "tree/tree1.nwk", "newick")
+        Phylo.write(nj_tree, 'tree/{0}.nwk'.format(self.id), "newick")
         if self.debug:
             print("Phylo.draw_ascii(nj_tree)")
-            self.nj_tree = Phylo.draw_ascii(nj_tree)
+            Phylo.draw_ascii(nj_tree)
 
 
 if __name__ == "__main__":
