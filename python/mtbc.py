@@ -202,12 +202,3 @@ class MtbcRandom:
 
 
 
-if __name__ == "__main__":
-    mtbc = MtbcRandom(debug=True, list_length=30)
-    # print(mtbc.construct_search_request())
-    # print()
-    # print(mtbc.id_list[:10])
-    # print()
-    # print(mtbc.acc_list)
-    # print()
-    # print(json.dumps(mtbc.alignement, indent=4))
