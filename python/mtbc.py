@@ -37,7 +37,7 @@ class MtbcRandom:
                  retmax=10000000,
                  list_length=10,
                  debug=False,
-                 email = 'A.N.Other@example.com'):
+                 email='A.N.Other@example.com'):
 
         # initial user variable
         self.debug = debug
