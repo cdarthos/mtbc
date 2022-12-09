@@ -2,4 +2,6 @@
 /python/epost.dtd
 /.idea/other.xml
 /.idea/deployment.xml
-/hs_err_pid16000.log
+/python/alignement/alignement.fasta
+/python/alignement/reconstruct_sequence.fasta
+/python/tree/tree1.nwk
