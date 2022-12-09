@@ -6,7 +6,7 @@ from mtbc import MtbcRandom
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/mtbc", methods='GET')
 def hello_world():
     return """<form action="/mtbc" method="POST">
   <div>
@@ -24,7 +24,7 @@ def hello_world():
 """
 
 
-@app.route("/mtbc", methods=['GET', 'POST'])
+@app.route("/mtbc", methods='POST')
 def flask_mtbc():
     debug = False
     if request.form.get('debug'):
@@ -33,7 +33,7 @@ def flask_mtbc():
     print("debug")
     print(debug)
     print(type(debug))
-    #tree = MtbcRandom(debug=debug, list_length=int(request.form['size']))
+    tree = MtbcRandom(debug=debug, list_length=int(request.form['size']))
 
     return os.listdir('tree')
 
