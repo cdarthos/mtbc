@@ -1,9 +1,9 @@
 import os
 
-import flask
+from flask import Flask, render_template, request
 from mtbc import MtbcRandom
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
 
 @app.route("/")
