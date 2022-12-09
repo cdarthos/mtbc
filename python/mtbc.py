@@ -35,23 +35,29 @@ class MtbcRandom:
                  select_mycobacterium_orygis=False,
                  select_mycobacterium_tuberculosis=False,
                  retmax=10000000,
-                 list_length=200,
-                 debug=False):
+                 list_length=10,
+                 debug=False,
+                 email = 'A.N.Other@example.com'):
 
+        # initial user variable
+        self.debug = debug
+        self.retmax = retmax
+        self.list_length = list_length
+        Entrez.email = email
+        self.select_taxa = {self.taxa_mycobacterium_canettii: select_mycobacterium_canettii,
+                            self.taxa_mycobacterium_mungi: select_mycobacterium_mungi,
+                            self.taxa_mycobacterium_orygis: select_mycobacterium_orygis,
+                            self.taxa_mycobacterium_tuberculosis: select_mycobacterium_tuberculosis}
+
+        # initialize empty variable
         self.acc_list = None
         self.sample_list = None
         self.ncbi_all_id = None
         self.ncbi_request_all_id = None
         self.align_with_alignIO = None
         self.df_mutation = None
-        self.debug = debug
-        self.retmax = retmax
-        self.list_length = list_length
-        Entrez.email = 'A.N.Other@example.com'
-        self.select_taxa = {self.taxa_mycobacterium_canettii: select_mycobacterium_canettii,
-                            self.taxa_mycobacterium_mungi: select_mycobacterium_mungi,
-                            self.taxa_mycobacterium_orygis: select_mycobacterium_orygis,
-                            self.taxa_mycobacterium_tuberculosis: select_mycobacterium_tuberculosis}
+
+        # main program
         self.construct_search_request()
         if self.debug:
             print("self.ncbi_request_all_id")
@@ -126,7 +132,14 @@ class MtbcRandom:
         self.acc_list = acc_list.to_list()
 
     def mtbc_request(self):
+        acc_list_len = len(self.acc_list)
+        index = 1
+        if self.debug:
+            print("mtbc_request")
         for sra in self.acc_list:
+            if self.debug:
+                print(str(index) + "/" + str(acc_list_len))
+                index += 1
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
                     'Host': 'gnksoftware.synology.me:30002'}
@@ -150,35 +163,40 @@ class MtbcRandom:
                             self.sequence_dict[r.text[1:].split("\n")[0]][diff.split(":")[1]] = diff.split(":")[3]
 
     def reconstruct_sequence_to_fasta_file(self):
-        df_mutation = pandas.DataFrame.from_dict(self.sequence_dict)
+
+        df_mutation = pandas.DataFrame.from_dict(self.sequence_dict, dtype='category')
+
         df_ref = pandas.Series(df_mutation['NC_000962.3'])
+
         if self.debug:
-            print(df_mutation)
+            print(df_mutation.info(memory_usage="deep"))
+            print(df_mutation.astype('category').info(memory_usage="deep"))
+
         with open('alignement/reconstruct_sequence.fasta', 'w') as writer:
             for column in df_mutation.columns:
                 df_mutation[column] = df_mutation[column].fillna(df_ref, axis=0)
-                if self.debug:
-                    print(">" + column)
-                    print("".join(df_mutation[column].to_list()))
                 writer.writelines(">" + column + "\n")
                 writer.writelines("".join(df_mutation[column].to_list()) + "\n")
 
     def align_reconstruct(self):
         self.align_with_alignIO = AlignIO.read('alignement/reconstruct_sequence.fasta', 'fasta')
 
-
     def create_nj_tree(self):
         calculator = DistanceCalculator('identity')
         dist_matrix = calculator.get_distance(self.align_with_alignIO)
+        if self.debug:
+            print("dist_matrix")
+            print(dist_matrix)
         constructor = DistanceTreeConstructor()
         nj_tree = constructor.nj(dist_matrix)
         Phylo.write(nj_tree, "tree/tree1.nwk", "newick")
         if self.debug:
+            print("Phylo.draw_ascii(nj_tree)")
             Phylo.draw_ascii(nj_tree)
 
 
 if __name__ == "__main__":
-    mtbc = MtbcRandom(debug=True)
+    mtbc = MtbcRandom(debug=True, list_length=1000)
     # print(mtbc.construct_search_request())
     # print()
     # print(mtbc.id_list[:10])
