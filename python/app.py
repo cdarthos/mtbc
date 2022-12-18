@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, render_template, request
-from mtbc import MtbcRandom
+from mtbc_package import MtbcRandom
 
 app = Flask(__name__)
 

@@ -147,7 +147,7 @@ class MtbcGetRandomSRA:
             #self.alignement: {},
             #self.id: str(id1) + "_" + str(list_length)"""
         }
-        return json.dumps(param,indent=4)
+        return param
 
 
 if __name__ == "__main__":

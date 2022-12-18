@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mtbc import MtbcRandom
+from mtbc_package import MtbcRandom
 
 
 class TestMtbcRandom(TestCase):
