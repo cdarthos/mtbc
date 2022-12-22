@@ -33,8 +33,7 @@ class MtbcGetRandomSRA:
                  list_length=10,
                  debug=False,
                  email='A.N.Other@example.com',
-                 id1=1,
-                 all_id_to_acc=True):
+                 all_id_to_acc=False):
 
         # initial user variable
         self.all_id_to_acc=all_id_to_acc
