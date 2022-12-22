@@ -1,5 +1,6 @@
 import json
 import random
+import uuid
 from operator import itemgetter
 import pandas as pd
 import xmltodict
@@ -59,7 +60,7 @@ class MtbcGetRandomSRA:
         self.sequence_dict = {'NC_000962.3': {}}
         self.alignement = {}
 
-        self.id = str(id1) + "_" + str(list_length)
+        self.id = str(uuid.uuid4()) + "_" + str(list_length)
 
         # main program
         self.construct_search_request()
@@ -168,7 +169,7 @@ class MtbcGetRandomSRA:
         runs_acc = list(map(xmltodict.parse, runs_1))
 
         acc_list = pd.json_normalize(runs_acc)['root.Run.@acc']
-        self.ncbi_random_acc_list = acc_list.to_list()
+        self.ncbi_random_acc_list = acc_list.dropna().to_list()
 
     def add_outgroup(self):
         self.ncbi_random_acc_list.append(self.outgroup)
