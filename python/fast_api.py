@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 import uvicorn
-from flask import json
+import json
 from fastapi.responses import FileResponse
 
-from python.mtbc_package import mtbc_ncbi, mtbc_tools
+from mtbc_package import mtbc_ncbi, mtbc_tools
 import uuid
 
 
