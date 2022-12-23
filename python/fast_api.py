@@ -87,7 +87,7 @@ async def nj_tree(debug: bool = False,
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_inst)
     mtbc_fasta.align_reconstruct()
     mtbc_fasta.create_nj_tree()
-    return FileResponse(path='tree/{0}.nwk'.format(mtbc_fasta.id), media_type='text/plain', filename="{0}".nwk)
+    return FileResponse(path='tree/{0}.nwk'.format(mtbc_fasta.id), media_type='text/plain', filename="{0}.nwk".format(mtbc_fasta.id))
 
 
 if __name__ == "__main__":
