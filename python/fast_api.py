@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import uvicorn
 import json
 from fastapi.responses import FileResponse
@@ -9,7 +9,7 @@ import uuid
 
 
 test = FastAPI()
-
+PATH "
 
 @test.get("/")
 async def root():
