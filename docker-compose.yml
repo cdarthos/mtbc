@@ -1,0 +1,18 @@
+version: "3.6"
+
+
+services:
+  fastapi:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      volumes:
+        - ./python/alignement:/code/python/alignement
+        - ./python/tree:/code/python/tree
+  fastapi:
+    build:
+      context: ./
+      dockerfile: Dockerfile_flask
+      volumes:
+        - ./python/alignement:/code/python/alignement
+        - ./python/tree:/code/python/tree
