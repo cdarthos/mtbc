@@ -106,4 +106,4 @@ async def nj_tree(debug: bool = False,
 
 
 if __name__ == "__main__":
-    uvicorn.run(test, host="0.0.0.0", port=8000)
+    uvicorn.run(test, host="0.0.0.0", port=80)
