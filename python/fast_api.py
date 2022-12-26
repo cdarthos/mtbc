@@ -17,9 +17,9 @@ async def root():
     return {"message": "Hello test"}
 
 @test.get("/show_fasta")
-async def show_fasta():
+async def show_fasta(request: Request):
     fasta = os.listdir("alignement/")    
-    return templates.TemplateResponse("index.html", {"fasta": fasta})
+    return templates.TemplateResponse("index.html", {"request": request, "fasta": fasta})
     
     #return fasta
 
