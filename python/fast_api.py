@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, UploadFile, File
 import uvicorn
 import json
 from fastapi.responses import FileResponse
@@ -14,6 +14,19 @@ PATH "
 @test.get("/")
 async def root():
     return {"message": "Hello test"}
+
+@test.get("/show_fasta")
+async def show_fasta():
+    fasta = os.listdir("alignement/")
+    return fasta
+
+@test.get("/download_fasta")
+async def download_fasta(fasta: str = ''):
+    return FileResponse(path='alignement/{0}'.format(fasta), media_type='text/plain',
+                        filename="{0}".format(fasta))
+
+
+
 
 
 @test.get("/mtbc_sra_list")
