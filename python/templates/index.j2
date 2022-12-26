@@ -9,7 +9,7 @@
                         <th>NJ_tree</th>
                     </tr>
                     </thead>
-                {% for todo in fasta %}
+                {% for todo in fasta if 'alignement' not in todo %}
                     <tr>
                     <td>
                     <a href="/download_fasta?fasta={{ todo }}">{{ todo }}</a>

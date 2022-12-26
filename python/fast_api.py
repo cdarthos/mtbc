@@ -72,8 +72,8 @@ async def fasta_align(debug: bool = False,
                       outgroup: str = '',
                       retmax: int = 10000000,
                       list_length: int = 10,
-                      email: str = 'A.N.Other@example.com',
-                      id1: int = 1):
+                      email: str = 'A.N.Other@example.com'
+                      ):
     mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(debug=debug,
                                            select_mycobacterium_canettii=select_mycobacterium_canettii,
                                            select_mycobacterium_mungi=select_mycobacterium_mungi,
