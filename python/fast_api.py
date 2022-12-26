@@ -9,7 +9,7 @@ import uuid
 
 
 test = FastAPI()
-PATH "
+
 
 @test.get("/")
 async def root():
