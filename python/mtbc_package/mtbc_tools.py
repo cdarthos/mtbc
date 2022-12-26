@@ -98,7 +98,7 @@ class MtbcAcclistToFASTA:
             print(dist_matrix)
         constructor = DistanceTreeConstructor()
         nj_tree = constructor.nj(dist_matrix)
-        Phylo.write(nj_tree.collapse_all(), 'nj_tree/{0}'.format(self.id), "newick",)
+        Phylo.write(nj_tree, 'nj_tree/{0}'.format(self.id), "newick",)
         if self.debug:
             print("Phylo.draw_ascii(nj_tree)")
             Phylo.draw_ascii(nj_tree)
