@@ -1,5 +1,5 @@
 /python/alignement/reconstruct_sequence.fasta
-/python/tree/tree1.nwk
+/python/nj_tree/tree1.nwk
 /python/alignement/*.fasta
 /python/tree/*.nwk
 /hs_err_pid8204.log

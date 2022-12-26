@@ -19,9 +19,12 @@ async def root():
 @test.get("/show_fasta")
 async def show_fasta(request: Request):
     fasta = os.listdir("alignement/")    
+    return templates.TemplateResponse("fasta_list.j2", {"request": request, "fasta": fasta})
+
+@test.get("/show_nj_tree")
+async def show_fasta(request: Request):
+    fasta = os.listdir("nj_tree/")
     return templates.TemplateResponse("index.html", {"request": request, "fasta": fasta})
-    
-    #return fasta
 
 @test.get("/download_fasta")
 async def download_fasta(fasta: str = ''):
@@ -103,7 +106,7 @@ async def nj_tree(debug: bool = False,
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_inst)
     mtbc_fasta.align_reconstruct()
     mtbc_fasta.create_nj_tree()
-    return FileResponse(path='tree/{0}.nwk'.format(mtbc_fasta.id), media_type='text/plain', filename="{0}.nwk".format(mtbc_fasta.id))
+    return FileResponse(path='nj_tree/{0}.nwk'.format(mtbc_fasta.id), media_type='text/plain', filename="{0}.nwk".format(mtbc_fasta.id))
 
 
 if __name__ == "__main__":

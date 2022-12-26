@@ -35,7 +35,7 @@ def flask_mtbc():
     print(type(debug))
     tree = MtbcRandom(debug=debug, list_length=int(request.form['size']))
 
-    return os.listdir('tree')
+    return os.listdir('nj_tree')
 
 
 if __name__ == "__main__":

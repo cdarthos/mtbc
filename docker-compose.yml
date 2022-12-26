@@ -8,6 +8,6 @@ services:
       dockerfile: Dockerfile
     volumes:
         - ./python/alignement:/code/python/alignement
-        - ./python/tree:/code/python/tree
+        - ./python/nj_tree:/code/python/nj_tree
     ports:
         - "80:80"
