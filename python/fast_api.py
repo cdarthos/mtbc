@@ -13,8 +13,8 @@ test = FastAPI()
 
 
 @test.get("/")
-async def root():
-    return {"message": "Hello test"}
+async def root(request: Request):
+    return templates.TemplateResponse("index.j2", {"request": request})
 
 @test.get("/show_fasta")
 async def show_fasta(request: Request):
