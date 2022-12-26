@@ -14,7 +14,9 @@ test = FastAPI()
 
 @test.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse("index.j2", {"request": request})
+    fasta = os.listdir("alignement/")
+    nj_tree = os.listdir("nj_tree/")
+    return templates.TemplateResponse("index.j2", {"request": request, "fasta": fasta, "nj_tree": nj_tree})
 
 @test.get("/show_fasta")
 async def show_fasta(request: Request):
