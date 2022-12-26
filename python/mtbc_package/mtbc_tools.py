@@ -81,14 +81,14 @@ class MtbcAcclistToFASTA:
 
         if self.debug:
             print(df_mutation.info(memory_usage="deep"))
-        with open('alignement/{0}.fasta'.format(self.id), 'w') as writer:
+        with open('alignement/{0}'.format(self.id), 'w') as writer:
             for column in df_mutation.columns:
                 df_mutation[column] = df_mutation[column].fillna(df_mutation['NC_000962.3'], axis=0)
                 writer.writelines(">" + column + "\n")
                 writer.writelines("".join(df_mutation[column].to_list()) + "\n")
 
     def align_reconstruct(self):
-        self.align_with_alignIO = AlignIO.read('alignement/{0}.fasta'.format(self.id), 'fasta')
+        self.align_with_alignIO = AlignIO.read('alignement/{0}'.format(self.id), 'fasta')
 
     def create_nj_tree(self):
         calculator = DistanceCalculator('identity')
@@ -98,7 +98,7 @@ class MtbcAcclistToFASTA:
             print(dist_matrix)
         constructor = DistanceTreeConstructor()
         nj_tree = constructor.nj(dist_matrix)
-        Phylo.write(nj_tree, 'nj_tree/{0}.nwk'.format(self.id), "newick")
+        Phylo.write(nj_tree, 'nj_tree/{0}'.format(self.id), "newick")
         if self.debug:
             print("Phylo.draw_ascii(nj_tree)")
             Phylo.draw_ascii(nj_tree)
