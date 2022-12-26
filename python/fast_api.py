@@ -2,11 +2,12 @@ from fastapi import FastAPI, Query, UploadFile, File
 import uvicorn
 import json
 from fastapi.responses import FileResponse
-
+from fastapi.templating import Jinja2Templates
 from mtbc_package import mtbc_ncbi, mtbc_tools
 import uuid
 import os
 
+templates = Jinja2Templates(directory="templates")
 
 test = FastAPI()
 
@@ -17,8 +18,10 @@ async def root():
 
 @test.get("/show_fasta")
 async def show_fasta():
-    fasta = os.listdir("alignement/")
-    return fasta
+    fasta = os.listdir("alignement/")    
+    return templates.TemplateResponse("index.html", {"fasta": fasta})
+    
+    #return fasta
 
 @test.get("/download_fasta")
 async def download_fasta(fasta: str = ''):
