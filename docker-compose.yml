@@ -6,8 +6,8 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      volumes:
+    volumes:
         - ./python/alignement:/code/python/alignement
         - ./python/tree:/code/python/tree
-      ports:
+    ports:
         - "80:80"
