@@ -1,14 +1,28 @@
 <div>Hello World</div>
     <div>
-        {% for todo in fasta %}
+
             <div class="task">
-                <small>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>alignement</th>
+                        <th>NJ_tree</th>
+                    </tr>
+                    </thead>
+                {% for todo in fasta %}
+                    <tr>
+                    <td>
                     <a href="/download_fasta?fasta={{ todo }}">{{ todo }}</a>
+                    </td>
+                    <td>
                     {%  if todo in nj_tree %}
                     <a href="/download_nj_tree?fasta={{ todo }}">{{ todo }}</a>
                     {% endif %}
-                </small>
+                    </td>
+                    </tr>
+                {% endfor %}
+                </table>
             </div>
-        {% endfor %}
+
     </div>
 

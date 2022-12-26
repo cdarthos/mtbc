@@ -34,9 +34,9 @@ async def download_fasta(fasta: str = ''):
                         filename="{0}.fasta".format(fasta))
 
 @test.get("/download_nj_tree")
-async def download_fasta(fasta: str = ''):
-    return FileResponse(path='nj_tree/{0}'.format(fasta), media_type='text/plain',
-                        filename="{0}.nwk".format(fasta))
+async def download_fasta(nj_tree: str = ''):
+    return FileResponse(path='nj_tree/{0}'.format(nj_tree), media_type='text/plain',
+                        filename="{0}.nwk".format(nj_tree))
 
 
 
