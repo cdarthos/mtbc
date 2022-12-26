@@ -9,6 +9,6 @@ services:
     volumes:
         - ./python/alignement:/code/python/alignement
         - ./python/nj_tree:/code/python/nj_tree
-        - ./:/code/python
+        - .:/code/python
     ports:
         - "80:80"
