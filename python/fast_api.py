@@ -23,8 +23,8 @@ async def show_fasta(request: Request):
 
 @test.get("/show_nj_tree")
 async def show_fasta(request: Request):
-    fasta = os.listdir("nj_tree/")
-    return templates.TemplateResponse("nj_tree_list.j2", {"request": request, "fasta": fasta})
+    nj_tree = os.listdir("nj_tree/")
+    return templates.TemplateResponse("nj_tree_list.j2", {"request": request, "nj_tree": nj_tree})
 
 @test.get("/download_fasta")
 async def download_fasta(fasta: str = ''):

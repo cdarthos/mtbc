@@ -1,3 +1,20 @@
 <div>Hello World</div>
-<div w3-include-html="/show_fasta"></div>
- <div w3-include-html="show_nj_tree"></div>
+    <div>
+        {% for todo in fasta %}
+            <div class="task">
+                <small>
+                    <a href="/download_nj_tree?fasta={{ todo }}">{{ todo }}</a>
+                </small>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div>
+        {% for todo in nj_tree %}
+            <div class="task">
+                <small>
+                    <a href="/download_fasta?fasta={{ todo }}">{{ todo }}</a>
+                </small>
+            </div>
+        {% endfor %}
+    </div>
