@@ -87,7 +87,7 @@ async def fasta_align_from_json(json_file: str = ""):
         mtbc_json = json.load(json_request, object_hook=lambda d: SimpleNamespace(**d))
     print(mtbc_json)
     print(mtbc_json.id)
-    #mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(**mtbc_json)
+    mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(mtbc_json)
     #print(mtbc_inst)
     #mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_json)
     #mtbc_fasta.align_reconstruct()
