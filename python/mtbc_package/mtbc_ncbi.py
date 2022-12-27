@@ -84,6 +84,7 @@ class MtbcGetRandomSRA:
         #    print("self.acc_list")
         #    print(self.ncbi_random_id_list)
         print(len(self.ncbi_random_acc_list))
+        self.to_json()
 
     def construct_search_request(self):
         if True in self.select_taxa.values():
@@ -182,6 +183,7 @@ class MtbcGetRandomSRA:
             "nj_tree": self.nj_tree,
             "ncbi_random_acc_list": self.ncbi_random_acc_list,
             "ncbi_random_id_list": self.ncbi_random_id_list,
+            "id": self.id
 
             #self.align_with_alignIO: None,
             #self.df_mutation: None,
@@ -189,6 +191,8 @@ class MtbcGetRandomSRA:
             #self.alignement: {},
             #self.id: str(id1) + "_" + str(list_length)"""
         }
+        with open("request/{0}".format(self.id), 'w') as json_request:
+            json.dump(param, json_request)
         return param
 
 
