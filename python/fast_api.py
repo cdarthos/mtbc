@@ -88,10 +88,10 @@ async def fasta_align_from_json(json_file: str = ""):
     print(mtbc_json)
     print(mtbc_json.id)
     mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(mtbc_json)
-    #print(mtbc_inst)
-    #mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_json)
-    #mtbc_fasta.align_reconstruct()
-    #return FileResponse(path='alignement/{0}'.format(mtbc_fasta.id), media_type='text/plain',filename="{0}.fasta".format(mtbc_fasta.id))
+    print(mtbc_inst)
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_json)
+    mtbc_fasta.align_reconstruct()
+    return FileResponse(path='alignement/{0}'.format(mtbc_fasta.id), media_type='text/plain',filename="{0}.fasta".format(mtbc_fasta.id))
 
 @test.get("/mtbc_nj_tree")
 async def nj_tree(debug: bool = False,
