@@ -193,9 +193,7 @@ class MtbcGetRandomSRA:
         #}
         with open("request/{0}".format(self.id), 'w') as json_request:
             json.dump(self, json_request)
-        return self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
-
+        return json.dumps(self)
 
 if __name__ == "__main__":
     mtbc_inst1 = MtbcGetRandomSRA(debug=False, list_length=9000, id1=3)
