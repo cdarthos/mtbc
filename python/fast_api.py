@@ -83,11 +83,11 @@ async def fasta_align(debug: bool = False,
 @test.get("/mtbc_fasta_align_from_json")
 async def fasta_align_from_json(json_file: str = ""):
     with open("request/{0}".format(json_file), 'r') as json_request:
-        mtbc_json = json.load(json_request)
+        mtbc_json = json.load(json_request, object_hook=lambda d: SimpleNamespace(**d))
     print(mtbc_json)
-    mtbc_inst = mtbc_json
-    print(mtbc_inst)
-    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_inst)
+    #mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(**mtbc_json)
+    #print(mtbc_inst)
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_json)
     mtbc_fasta.align_reconstruct()
     return FileResponse(path='alignement/{0}'.format(mtbc_fasta.id), media_type='text/plain',
                         filename="{0}.fasta".format(mtbc_fasta.id))
