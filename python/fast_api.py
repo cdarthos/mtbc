@@ -83,7 +83,7 @@ async def fasta_align(debug: bool = False,
 @test.get("/mtbc_fasta_align_from_json")
 async def fasta_align_from_json(json_file: str = ""):
     with open("request/{0}".format(json_file), 'r') as json_request:
-        mtbc_json = json.loads(json_request)
+        mtbc_json = json.load(json_request)
     print(mtbc_json)
     mtbc_inst = mtbc_json
     print(mtbc_inst)
