@@ -81,8 +81,8 @@ async def fasta_align(debug: bool = False,
 
 
 @test.get("/mtbc_fasta_align_from_json")
-async def fasta_align_from_json(json: str = ""):
-    with open("request/{0}".format(json), 'r') as json_request:
+async def fasta_align_from_json(json_file: str = ""):
+    with open("request/{0}".format(json_file), 'r') as json_request:
         mtbc_inst = json.load(json_request)
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_inst)
     mtbc_fasta.align_reconstruct()
