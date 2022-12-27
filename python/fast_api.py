@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from mtbc_package import mtbc_ncbi, mtbc_tools
 import uuid
 import os
+from types import SimpleNamespace
 
 templates = Jinja2Templates(directory="templates")
 
