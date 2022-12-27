@@ -8,6 +8,7 @@ from Bio import Entrez
 from sklearn.utils import shuffle
 
 class MtbcGetRandomSRA:
+    self.ddebug = False
     # Mycobacterium tuberculosis complex 77643
     taxa_mycobacterium_tuberculosis_complex = '77643'
 
@@ -32,14 +33,14 @@ class MtbcGetRandomSRA:
                  outgroup='',
                  retmax=10000000,
                  list_length=10,
-                 debug=False,
+                 #debug=False,
                  email='A.N.Other@example.com',
                  all_id_to_acc=False):
 
         # initial user variable
         self.all_id_to_acc=all_id_to_acc
         self.outgroup = outgroup
-        self.ddebug = debug
+        #self.ddebug = debug
         self.retmax = retmax
         self.list_length = list_length
         Entrez.email = email
