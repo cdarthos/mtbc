@@ -24,6 +24,29 @@ class MtbcGetRandomSRA:
     taxa_mycobacterium_tuberculosis = '1773'
 
     def __init__(self,
+                 json_request):
+        # initial user variable
+        self.all_id_to_acc= False
+        self.outgroup = json_request["outgroup"]
+        self.debug = json_request["debug"]
+        self.retmax = json_request["retmax"]
+        self.list_length = json_request["list_length"]
+        Entrez.email = json_request["email"]
+        self.email = json_request["email"]
+        self.select_taxa = json_request["select_taxa"]
+
+        # initialize empty variable
+        self.nj_tree = None
+        self.ncbi_random_acc_list = json_request["ncbi_random_acc_list"]
+        self.ncbi_random_id_list = json_request["ncbi_random_id_list"]
+        self.ncbi_all_id = None
+        self.ncbi_request_all_id = None
+        self.align_with_alignIO = None
+        self.df_mutation = None
+        self.sequence_dict = {'NC_000962.3': {}}
+        self.alignement = {}
+        
+    def __init__(self,
                  select_mycobacterium_canettii=False,
                  select_mycobacterium_mungi=False,
                  select_mycobacterium_orygis=False,
