@@ -80,6 +80,15 @@ async def fasta_align(debug: bool = False,
                         filename="{0}.fasta".format(mtbc_fasta.id))
 
 
+@test.get("/mtbc_fasta_align_from_json")
+async def fasta_align_from_json(json: str = ""):
+    with open("request/{0}".format(json), 'r') as json_request:
+        mtbc_inst = json.load(json_request)
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_inst)
+    mtbc_fasta.align_reconstruct()
+    return FileResponse(path='alignement/{0}'.format(mtbc_fasta.id), media_type='text/plain',
+                        filename="{0}.fasta".format(mtbc_fasta.id))
+
 @test.get("/mtbc_nj_tree")
 async def nj_tree(debug: bool = False,
                   select_mycobacterium_canettii: bool = False,
