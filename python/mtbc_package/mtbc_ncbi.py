@@ -39,7 +39,7 @@ class MtbcGetRandomSRA:
         # initial user variable
         self.all_id_to_acc=all_id_to_acc
         self.outgroup = outgroup
-        self.debug = debug
+        self.ddebug = debug
         self.retmax = retmax
         self.list_length = list_length
         Entrez.email = email
@@ -64,24 +64,24 @@ class MtbcGetRandomSRA:
 
         # main program
         self.construct_search_request()
-        if self.debug:
+        if self.ddebug:
             print("self.ncbi_request_all_id")
             # print(self.ncbi_request_all_id[:10])
         self.get_all_id()
-        if self.debug:
+        if self.ddebug:
             print("self.ncbi_all_id")
             # print(self.ncbi_all_id[:10])
         self.select_random_ncbi_id_number()
-        if self.debug:
+        if self.ddebug:
             print("self.sample_list")
             print(self.ncbi_random_id_list)
 
         self.acc_number_from_ncbi_id()
-        if self.debug:
+        if self.ddebug:
             print("self.acc_list")
             # print(self.acc_list)
         #self.add_outgroup()
-        #if self.debug:
+        #if self.ddebug:
         #    print("self.acc_list")
         #    print(self.ncbi_random_id_list)
         print(len(self.ncbi_random_acc_list))
@@ -102,7 +102,7 @@ class MtbcGetRandomSRA:
                                 retmax=retmax,
                                 retstart=0)
         record = Entrez.read(handle)
-        if self.debug:
+        if self.ddebug:
             print("Entrez.esearch")
             # print(record)
         handle.close()
@@ -138,7 +138,7 @@ class MtbcGetRandomSRA:
                                               retmax=5000
                                               )
             record_esummary = Entrez.read(handle_esummary)
-            if self.debug:
+            if self.ddebug:
                 print("record_esummary")
                 # print(record_esummary)
             handle_esummary.close()
@@ -156,7 +156,7 @@ class MtbcGetRandomSRA:
                                           id=",".join(map(str, self.ncbi_random_id_list))
                                           )
         record_esummary = Entrez.read(handle_esummary)
-        if self.debug:
+        if self.ddebug:
             print("record_esummary")
             # print(record_esummary)
         handle_esummary.close()
@@ -196,6 +196,6 @@ class MtbcGetRandomSRA:
         return json.dumps(self)
 
 if __name__ == "__main__":
-    mtbc_inst1 = MtbcGetRandomSRA(debug=False, list_length=9000, id1=3)
+    mtbc_inst1 = MtbcGetRandomSRA(ddebug=False, list_length=9000, id1=3)
     #print(mtbc.to_json())
 
