@@ -15,9 +15,15 @@ test = FastAPI()
 
 @test.get("/")
 async def root(request: Request):
+    sra_list = os.listdir("request/")
     fasta = os.listdir("alignement/")
     nj_tree = os.listdir("nj_tree/")
-    return templates.TemplateResponse("index.j2", {"request": request, "fasta": fasta, "nj_tree": nj_tree})
+    return templates.TemplateResponse("index.j2", {"request": request, "fasta": fasta, "nj_tree": nj_tree, "sra_list": sra_list})
+
+@test.get("/download_sra")
+async def download_sra(json_file: str = ''):
+    with open("request/{0}".format(json_file), 'r') as json_request:
+        return json.load(json_request)
 
 
 @test.get("/download_fasta")
@@ -51,7 +57,6 @@ async def set_param(debug: bool = False,
                                            retmax=retmax,
                                            list_length=list_length,
                                            email=email)
-    print(json.dumps(mtbc_inst.to_json()))
     return mtbc_inst.to_json()
 
 

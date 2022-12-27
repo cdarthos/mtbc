@@ -1,27 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
+
+</style>
+</head>
+<body>
+
+
 <a href="/docs">/docs#</a>
     <div>
 
             <div class="task">
-                <table>
+                <table id="customers">
                     <thead>
                     <tr>
+                        <th>SRA_list</th>
                         <th>alignement</th>
                         <th>NJ_tree</th>
                         <th>ncbi size</th>
                     </tr>
                     </thead>
-                {% for todo in fasta if 'alignement' not in todo %}
+                {% for sra in sra_list if 'request' not in sra %}
                     <tr>
                     <td>
-                    <a href="/download_fasta?fasta={{ todo }}">{{ todo }}</a>
+                    <a href="/download_sra?json_file={{ sra }}">{{ sra }}</a>
                     </td>
                     <td>
-                    {%  if todo in nj_tree %}
-                    <a href="/download_nj_tree?fasta={{ todo }}">{{ todo }}</a>
+                    {%  if sra in fasta %}
+                    <a href="/download_fasta?fasta={{ sra }}">{{ sra }}</a>
                     {% endif %}
                     </td>
                     <td>
-                        {% set size = todo.split("_")[1] %}
+                    {%  if sra in nj_tree %}
+                    <a href="/download_nj_tree?fasta={{ sra }}">{{ sra }}</a>
+                    {% endif %}
+                    </td>
+                    <td>
+                        {% set size = sra.split("_")[1] %}
                         <a>{{ size }}</a>
                     </td>
                     </tr>
@@ -31,3 +70,5 @@
 
     </div>
 
+</body>
+</html>

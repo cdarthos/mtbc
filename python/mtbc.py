@@ -17,7 +17,8 @@ from python.mtbc_package.mtbc_tools import MtbcAcclistToFASTA
 if __name__ == "__main__":
     # mtbc = MtbcGetRandomSRA(debug=True, list_length=1000,select_mycobacterium_canettii=True,
     # select_mycobacterium_mungi=True, select_mycobacterium_orygis=True)
-    mtbc = MtbcGetRandomSRA(debug=True, list_length=10, id1=2)
+    mtbc = MtbcGetRandomSRA(debug=True, list_length=10)
+
     print(mtbc.ncbi_random_acc_list)
     #mtbc_2 = MtbcAcclistToFASTA(mtbc)
 

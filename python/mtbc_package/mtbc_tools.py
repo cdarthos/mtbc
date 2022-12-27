@@ -1,9 +1,15 @@
+import json
+from json import JSONEncoder
+
 import pandas
 import requests
 from Bio import Entrez, AlignIO, Phylo
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from pandas import CategoricalDtype
 
+class customEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
 
 class MtbcAcclistToFASTA:
 
@@ -34,11 +40,8 @@ class MtbcAcclistToFASTA:
             print("self.sequence")
             # print(self.sequence_dict)
         self.reconstruct_sequence_to_fasta_file()
-        # self.align_reconstruct()
-        # if self.debug:
-        #     print("self.align_with_alignIO")
-        #     #print(self.align_with_alignIO)
-        # self.create_nj_tree()
+
+        self.to_json_file()
 
     def mtbc_request(self):
         acc_list_len = len(self.acc_list)
@@ -102,3 +105,9 @@ class MtbcAcclistToFASTA:
         if self.debug:
             print("Phylo.draw_ascii(nj_tree)")
             Phylo.draw_ascii(nj_tree)
+
+
+    def to_json_file(self):
+        self.ncbi_all_id = None
+        with open("request/{0}".format(self.id), 'w') as json_request:
+            json.dump(self, json_request, cls=customEncoder)
