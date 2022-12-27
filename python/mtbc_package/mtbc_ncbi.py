@@ -192,8 +192,7 @@ class MtbcGetRandomSRA:
         #    #self.id: str(id1) + "_" + str(list_length)"""
         #}
         with open("request/{0}".format(self.id), 'w') as json_request:
-            json.dump(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4, json_request)
+            json.dump(self, json_request)
         return self, default=lambda o: o.__dict__, 
             sort_keys=True, indent=4)
 
