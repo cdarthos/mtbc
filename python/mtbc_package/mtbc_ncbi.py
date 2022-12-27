@@ -8,7 +8,7 @@ from Bio import Entrez
 from sklearn.utils import shuffle
 
 class MtbcGetRandomSRA:
-    self.ddebug = False
+    ddebug = False
     # Mycobacterium tuberculosis complex 77643
     taxa_mycobacterium_tuberculosis_complex = '77643'
 
@@ -103,9 +103,9 @@ class MtbcGetRandomSRA:
                                 retmax=retmax,
                                 retstart=0)
         record = Entrez.read(handle)
-        if self.ddebug:
-            print("Entrez.esearch")
-            # print(record)
+        #if self.ddebug:
+        #    print("Entrez.esearch")
+        #    # print(record)
         handle.close()
         self.ncbi_all_id = record['IdList']
 
