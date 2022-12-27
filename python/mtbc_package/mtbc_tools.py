@@ -11,7 +11,7 @@ class MtbcAcclistToFASTA:
                  mtbc_get_random_sra):
 
         # initial user variable
-        self.debug = mtbc_get_random_sra.debug
+        #self.debug = mtbc_get_random_sra.debug
         self.retmax = mtbc_get_random_sra.retmax
         self.list_length = mtbc_get_random_sra.list_length
         Entrez.email = mtbc_get_random_sra.email
