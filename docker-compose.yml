@@ -6,6 +6,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    restart: always
     volumes:
         - ./python/alignement:/code/python/alignement
         - ./python/nj_tree:/code/python/nj_tree
