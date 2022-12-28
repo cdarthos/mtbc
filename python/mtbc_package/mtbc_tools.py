@@ -6,19 +6,18 @@ import requests
 from Bio import Entrez, AlignIO, Phylo
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from pandas import CategoricalDtype
+import logging
+from .custom_encoder import customEncoder
+from .mtbc_ncbi import MtbcGetRandomSRA
 
-class customEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
+log = logging.getLogger("mtbc_tool")
 
 class MtbcAcclistToFASTA:
 
     def __init__(self,
-                 mtbc_get_random_sra):
+                 mtbc_get_random_sra: MtbcGetRandomSRA):
 
         # initial user variable
-        self.debug = False
-        #self.retmax = mtbc_get_random_sra.retmax
         self.list_length = mtbc_get_random_sra.list_length
         Entrez.email = mtbc_get_random_sra.email
         self.select_taxa = mtbc_get_random_sra.select_taxa
@@ -38,9 +37,8 @@ class MtbcAcclistToFASTA:
         with open('alignement/{0}'.format(self.id), 'w') as writer:
             pass
         self.mtbc_request()
-        if self.debug:
-            print("self.sequence")
-            # print(self.sequence_dict)
+        log.info("self.sequence")
+        log.debug(self.sequence_dict)
         self.reconstruct_sequence_to_fasta_file()
 
         self.to_json_file()
@@ -48,12 +46,10 @@ class MtbcAcclistToFASTA:
     def mtbc_request(self):
         acc_list_len = len(self.acc_list)
         index = 1
-        if True or self.debug:
-            print("mtbc_request")
+        log.info("mtbc_request")
         for sra in self.acc_list:
-            if True or self.debug:
-                print(str(index) + "/" + str(acc_list_len))
-                index += 1
+            logging.info(str(index) + "/" + str(acc_list_len))
+            index += 1
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
                     'Host': 'gnksoftware.synology.me:30002'}
@@ -66,8 +62,7 @@ class MtbcAcclistToFASTA:
             r = requests.post(url, parameters, head)
 
             if len(r.text) != 0:
-                if self.debug:
-                    print(r.text[1:].split("\n")[0])
+                log.info(r.text[1:].split("\n")[0])
                 self.sequence_dict[r.text[1:].split("\n")[0]] = {}
                 for diff in r.text.split("\n")[2:]:
                     if len(diff) != 0:
@@ -84,8 +79,7 @@ class MtbcAcclistToFASTA:
 
         df_mutation = pandas.DataFrame.from_dict(self.sequence_dict, dtype=cat_type)
 
-        if self.debug:
-            print(df_mutation.info(memory_usage="deep"))
+        log.info(df_mutation.info(memory_usage="deep"))
         with open('alignement/{0}'.format(self.id), 'w') as writer:
             for column in df_mutation.columns:
                 df_mutation[column] = df_mutation[column].fillna(df_mutation['NC_000962.3'], axis=0)
@@ -100,16 +94,11 @@ class MtbcAcclistToFASTA:
             pass
         calculator = DistanceCalculator('identity')
         dist_matrix = calculator.get_distance(self.align_with_alignIO)
-        if self.debug:
-            print("dist_matrix")
-            print(dist_matrix)
+        log.info("dist_matrix")
+        log.debug(dist_matrix)
         constructor = DistanceTreeConstructor()
-        nj_tree = constructor.nj(dist_matrix)
-        Phylo.write(nj_tree, 'nj_tree/{0}'.format(self.id), "newick",)
-        if self.debug:
-            print("Phylo.draw_ascii(nj_tree)")
-            Phylo.draw_ascii(nj_tree)
-
+        self.nj_tree = constructor.nj(dist_matrix)
+        Phylo.write(self.nj_tree, 'nj_tree/{0}'.format(self.id), "newick", )
 
     def to_json_file(self):
         self.ncbi_all_id = None

@@ -1,21 +1,19 @@
 import json
+import logging
 import random
 import uuid
-from json import JSONEncoder
+# from json import JSONEncoder
 from operator import itemgetter
 import pandas as pd
 import xmltodict
 from Bio import Entrez
 from sklearn.utils import shuffle
-from types import SimpleNamespace
+# from types import SimpleNamespace
+from .custom_encoder import customEncoder
 
-
-class customEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
+log = logging.getLogger("mtbc_ncbi")
 
 class MtbcGetRandomSRA:
-    debug = False
     # Mycobacterium tuberculosis complex 77643
     taxa_mycobacterium_tuberculosis_complex = '77643'
 
@@ -31,24 +29,19 @@ class MtbcGetRandomSRA:
     # Mycobacterium tuberculosis 1773
     taxa_mycobacterium_tuberculosis = '1773'
 
-        
     def __init__(self,
                  select_mycobacterium_canettii=False,
                  select_mycobacterium_mungi=False,
                  select_mycobacterium_orygis=False,
                  select_mycobacterium_tuberculosis=False,
                  outgroup='',
-                 retmax=10000000,
                  list_length=10,
-                 debug=False,
                  email='A.N.Other@example.com',
                  all_id_to_acc=False):
 
         # initial user variable
-        self.all_id_to_acc=all_id_to_acc
+        self.all_id_to_acc = all_id_to_acc
         self.outgroup = outgroup
-        #self.ddebug = debug
-        self.retmax = retmax
         self.list_length = list_length
         Entrez.email = email
         self.email = email
@@ -72,27 +65,17 @@ class MtbcGetRandomSRA:
 
         # main program
         self.construct_search_request()
-        if self.debug:
-            print("self.ncbi_request_all_id")
-            # print(self.ncbi_request_all_id[:10])
+        log.info("self.ncbi_request_all_id")
         self.get_all_id()
-        if self.debug:
-            print("self.ncbi_all_id")
-            # print(self.ncbi_all_id[:10])
+        log.info("self.ncbi_all_id")
+
         self.select_random_ncbi_id_number()
-        if self.debug:
-            print("self.sample_list")
-            print(self.ncbi_random_id_list)
+        log.info("self.sample_list")
 
         self.acc_number_from_ncbi_id()
-        if self.debug:
-            print("self.acc_list")
-            # print(self.acc_list)
-        #self.add_outgroup()
-        #if self.ddebug:
-        #    print("self.acc_list")
-        #    print(self.ncbi_random_id_list)
-        print(len(self.ncbi_random_acc_list))
+        log.info("self.acc_list")
+
+        log.info(len(self.ncbi_random_acc_list))
         self.to_json_file()
 
     def construct_search_request(self):
@@ -110,22 +93,18 @@ class MtbcGetRandomSRA:
                                 retmax=retmax,
                                 retstart=0)
         record = Entrez.read(handle)
-        #if self.ddebug:
-        #    print("Entrez.esearch")
-        #    # print(record)
         handle.close()
         self.ncbi_all_id = record['IdList']
 
     def get_random_acc_list_DEV(self):
         shuffled_id_list = shuffle(self.ncbi_all_id)
 
-
     def select_random_ncbi_id_number(self):
         self.ncbi_random_id_list = random.choices(self.ncbi_all_id,
                                                   k=self.list_length)
 
     def acc_number_from_ncbi_id(self):
-        if self.all_id_to_acc :
+        if self.all_id_to_acc:
             self.no_limit_acc_number_from_ncbi_id()
         else:
             self.limit_acc_number_from_ncbi_id()
@@ -134,8 +113,8 @@ class MtbcGetRandomSRA:
         handle_epost = Entrez.epost(db="sra", id=",".join(map(str, self.ncbi_all_id)))
         record_epost = Entrez.read(handle_epost)
         handle_epost.close()
-        print(record_epost)
-        print(record_epost['WebEnv'])
+        log.debug(record_epost)
+        log.debug(record_epost['WebEnv'])
 
         for start in range(0, len(self.ncbi_all_id), 5000):
             print(start)
@@ -146,9 +125,6 @@ class MtbcGetRandomSRA:
                                               retmax=5000
                                               )
             record_esummary = Entrez.read(handle_esummary)
-            if self.debug:
-                print("record_esummary")
-                # print(record_esummary)
             handle_esummary.close()
             runs = list(map(itemgetter('Runs'),
                             record_esummary))
@@ -158,15 +134,13 @@ class MtbcGetRandomSRA:
             acc_list = pd.json_normalize(runs_acc)['root.Run.@acc']
             self.ncbi_random_acc_list = self.ncbi_random_acc_list + acc_list.to_list()
 
-
     def limit_acc_number_from_ncbi_id(self):
         handle_esummary = Entrez.esummary(db="sra",
                                           id=",".join(map(str, self.ncbi_random_id_list))
                                           )
         record_esummary = Entrez.read(handle_esummary)
-        if self.debug:
-            print("record_esummary")
-            # print(record_esummary)
+        logging.info("record_esummary")
+        log.info(record_esummary)
         handle_esummary.close()
 
         runs = list(map(itemgetter('Runs'),
@@ -190,11 +164,10 @@ class MtbcGetRandomSRA:
 
     def to_json(self):
         self.ncbi_all_id = None
-
-        return json.dumps(self, cls=customEncoder)
+        #return json.dumps(self, cls=customEncoder)
+        return self.__dict__
 
 
 if __name__ == "__main__":
-    mtbc_inst1 = MtbcGetRandomSRA(debug=False, list_length=10)
-    #print(mtbc.to_json())
-
+    mtbc_inst1 = MtbcGetRandomSRA(list_length=10)
+    # print(mtbc.to_json())
