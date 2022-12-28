@@ -35,6 +35,8 @@ class MtbcAcclistToFASTA:
         self.sequence_dict = {'NC_000962.3': {}}
         self.alignement = {}
 
+        with open('alignement/{0}'.format(self.id), 'w') as writer:
+            pass
         self.mtbc_request()
         if self.debug:
             print("self.sequence")
@@ -94,6 +96,8 @@ class MtbcAcclistToFASTA:
         self.align_with_alignIO = AlignIO.read('alignement/{0}'.format(self.id), 'fasta')
 
     def create_nj_tree(self):
+        with open('nj_tree/{0}'.format(self.id), 'w') as writer:
+            pass
         calculator = DistanceCalculator('identity')
         dist_matrix = calculator.get_distance(self.align_with_alignIO)
         if self.debug:
