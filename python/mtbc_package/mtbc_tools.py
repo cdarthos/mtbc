@@ -1,5 +1,5 @@
 import json
-from json import JSONEncoder
+import os
 
 import pandas
 import requests
@@ -9,8 +9,11 @@ from pandas import CategoricalDtype
 import logging
 from .custom_encoder import customEncoder
 from .mtbc_ncbi import MtbcGetRandomSRA
+import dendropy
+from dendropy.interop import raxml
 
 log = logging.getLogger("mtbc_tool")
+
 
 class MtbcAcclistToFASTA:
 
@@ -18,24 +21,26 @@ class MtbcAcclistToFASTA:
                  mtbc_get_random_sra: MtbcGetRandomSRA):
 
         # initial user variable
+        self.ml_tree = mtbc_get_random_sra.ml_tree
         self.list_length = mtbc_get_random_sra.list_length
         Entrez.email = mtbc_get_random_sra.email
+        self.email = mtbc_get_random_sra.email
         self.select_taxa = mtbc_get_random_sra.select_taxa
 
         # initialize empty variable
-        self.nj_tree = None
-        self.acc_list = mtbc_get_random_sra.ncbi_random_acc_list
-        self.sample_list = None
+        self.nj_tree = mtbc_get_random_sra.nj_tree
+        self.ncbi_random_acc_list = mtbc_get_random_sra.ncbi_random_acc_list
+        self.sample_list = mtbc_get_random_sra.sample_list
         self.ncbi_all_id = None
-        self.ncbi_request_all_id = None
-        self.align_with_alignIO = None
-        self.df_mutation = None
+        self.ncbi_request_all_id = mtbc_get_random_sra.ncbi_request_all_id
+        self.align_with_alignIO = mtbc_get_random_sra.align_with_alignIO
+        self.df_mutation = mtbc_get_random_sra.df_mutation
         self.id = mtbc_get_random_sra.id
         self.sequence_dict = {'NC_000962.3': {}}
         self.alignement = {}
 
         with open('alignement/{0}'.format(self.id), 'w') as writer:
-            pass
+            writer.write("")
         self.mtbc_request()
         log.info("self.sequence")
         log.debug(self.sequence_dict)
@@ -86,12 +91,43 @@ class MtbcAcclistToFASTA:
                 writer.writelines(">" + column + "\n")
                 writer.writelines("".join(df_mutation[column].to_list()) + "\n")
 
+    def to_json_file(self):
+        self.ncbi_all_id = None
+        with open("request/{0}".format(self.id), 'w') as json_request:
+            json.dump(self, json_request, cls=customEncoder)
+
+
+class MtbcTree:
+    def __init__(self,
+                 mtbc_get_random_sra: MtbcGetRandomSRA):
+        # initial user variable
+        self.ml_tree = mtbc_get_random_sra.ml_tree
+        self.list_length = mtbc_get_random_sra.list_length
+        Entrez.email = mtbc_get_random_sra.email
+        self.email = mtbc_get_random_sra.email
+        self.select_taxa = mtbc_get_random_sra.select_taxa
+
+        # initialize empty variable
+        self.nj_tree = mtbc_get_random_sra.nj_tree
+        self.ncbi_random_acc_list = mtbc_get_random_sra.ncbi_random_acc_list
+        self.sample_list = mtbc_get_random_sra.sample_list
+        self.ncbi_all_id = None
+        self.ncbi_request_all_id = mtbc_get_random_sra.ncbi_request_all_id
+        self.align_with_alignIO = mtbc_get_random_sra.align_with_alignIO
+        self.df_mutation = mtbc_get_random_sra.df_mutation
+        self.id = mtbc_get_random_sra.id
+        self.sequence_dict = mtbc_get_random_sra.sequence_dict
+        self.alignement = mtbc_get_random_sra.alignement
+        if not os.path.exists('alignement/{0}'.format(self.id)):
+            MtbcAcclistToFASTA(self)
+        self.align_reconstruct()
+
     def align_reconstruct(self):
         self.align_with_alignIO = AlignIO.read('alignement/{0}'.format(self.id), 'fasta')
 
     def create_nj_tree(self):
         with open('nj_tree/{0}'.format(self.id), 'w') as writer:
-            pass
+            writer.write("")
         calculator = DistanceCalculator('identity')
         dist_matrix = calculator.get_distance(self.align_with_alignIO)
         log.info("dist_matrix")
@@ -99,6 +135,25 @@ class MtbcAcclistToFASTA:
         constructor = DistanceTreeConstructor()
         self.nj_tree = constructor.nj(dist_matrix)
         Phylo.write(self.nj_tree, 'nj_tree/{0}'.format(self.id), "newick", )
+        self.to_json_file()
+
+    def create_ml_tree(self):
+        with open('ml_tree/{0}'.format(self.id), 'w') as writer:
+            writer.write("")
+        data = dendropy.DnaCharacterMatrix.get(
+            path='alignement/{0}'.format(self.id),
+            schema="fasta")
+        log.info("data")
+        log.info(data)
+        rx = raxml.RaxmlRunner()
+        ml_tree = rx.estimate_tree(
+            char_matrix=data,
+            raxml_args=["--no-bfgs"])
+        self.ml_tree = ml_tree.as_string(schema="newick")
+        log.info(self.ml_tree)
+        self.to_json_file()
+        with open('ml_tree/{0}'.format(self.id), 'w') as writer:
+            writer.writelines(self.ml_tree)
 
     def to_json_file(self):
         self.ncbi_all_id = None

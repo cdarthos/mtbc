@@ -26,25 +26,29 @@ async def root(request: Request):
     sra_list = os.listdir("request/")
     fasta = os.listdir("alignement/")
     nj_tree = os.listdir("nj_tree/")
-    return templates.TemplateResponse("index.j2", {"request": request, "fasta": fasta, "nj_tree": nj_tree, "sra_list": sra_list})
+    ml_tree = os.listdir("ml_tree/")
+    return templates.TemplateResponse("index.j2", {"request": request, "fasta": fasta, "nj_tree": nj_tree, "sra_list": sra_list, "ml_tree": ml_tree})
 
 @test.get("/download_sra")
-async def download_sra(json_file: str = ''):
-    with open("request/{0}".format(json_file), 'r') as json_request:
+async def download_sra(id: str = ''):
+    with open("request/{0}".format(id), 'r') as json_request:
         return json.load(json_request)
 
 
 @test.get("/download_fasta")
-async def download_fasta(fasta: str = ''):
-    return FileResponse(path='alignement/{0}'.format(fasta), media_type='text/plain',
-                        filename="{0}.fasta".format(fasta))
+async def download_fasta(id: str = ''):
+    return FileResponse(path='alignement/{0}'.format(id), media_type='text/plain',
+                        filename="{0}.fasta".format(id))
 
 @test.get("/download_nj_tree")
-async def download_fasta(nj_tree: str = ''):
-    return FileResponse(path='nj_tree/{0}'.format(nj_tree), media_type='text/plain',
-                        filename="{0}.nwk".format(nj_tree))
+async def download_nj_tree(id: str = ''):
+    return FileResponse(path='nj_tree/{0}'.format(id), media_type='text/plain',
+                        filename="{0}.nwk".format(id))
 
-
+@test.get("/download_ml_tree")
+async def download_ml_tree(id: str = ""):
+    return FileResponse(path='ml_tree/{0}'.format(id), media_type='text/plain',
+                        filename="{0}.nwk".format(id))
 
 @test.get("/mtbc_sra_list")
 async def set_param(select_mycobacterium_canettii: bool = False,
@@ -85,19 +89,46 @@ async def fasta_align(select_mycobacterium_canettii: bool = False,
                                            list_length=list_length,
                                            email=email)
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_inst)
-    mtbc_fasta.align_reconstruct()
     return FileResponse(path='alignement/{0}'.format(mtbc_fasta.id), media_type='text/plain',
                         filename="{0}.fasta".format(mtbc_fasta.id))
 
 
 @test.get("/mtbc_fasta_align_from_json")
-async def fasta_align_from_json(json_file: str = Query("id",enum=test.json_sra)):
+async def fasta_align_from_json(json_file: str = Query("id",enum=os.listdir("request/"))):
     with open("request/{0}".format(json_file), 'r') as json_request:
         mtbc_json = json.load(json_request, object_hook=lambda d: SimpleNamespace(**d))
     logger.info(mtbc_json)
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_json)
-    mtbc_fasta.align_reconstruct()
     return FileResponse(path='alignement/{0}'.format(mtbc_fasta.id), media_type='text/plain',filename="{0}.fasta".format(mtbc_fasta.id))
+
+@test.get("/mtbc_nj_tree_from_fasta")
+async def nj_tree_from_fasta(json_file: str = Query("id",enum=os.listdir("request/"))):
+    with open("request/{0}".format(json_file), 'r') as json_request:
+        mtbc_json = json.load(json_request, object_hook=lambda d: SimpleNamespace(**d))
+    logger.info(mtbc_json)
+    nj_tree = mtbc_tools.MtbcTree(mtbc_json)
+    nj_tree.create_nj_tree()
+    return FileResponse(path='nj_tree/{0}'.format(nj_tree.id), media_type='text/plain',
+                        filename="{0}-nj.nwk".format(nj_tree.id))
+
+
+@test.get("/mtbc_ml_tree_from_fasta")
+async def ml_tree_from_fasta(json_file: str = Query("id",enum=os.listdir("request/"))):
+    with open("request/{0}".format(json_file), 'r') as json_request:
+        mtbc_json = json.load(json_request, object_hook=lambda d: SimpleNamespace(**d))
+    logger.info(mtbc_json)
+    ml_tree = mtbc_tools.MtbcTree(mtbc_json)
+    ml_tree.create_ml_tree()
+    return FileResponse(path='ml_tree/{0}'.format(ml_tree.id), media_type='text/plain',
+                        filename="{0}-ml.nwk".format(ml_tree.id))
+
+
+
+
+
+
+
+
 
 @test.get("/mtbc_nj_tree")
 async def nj_tree(select_mycobacterium_canettii: bool = False,
@@ -117,7 +148,28 @@ async def nj_tree(select_mycobacterium_canettii: bool = False,
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_inst)
     mtbc_fasta.align_reconstruct()
     mtbc_fasta.create_nj_tree()
-    return FileResponse(path='nj_tree/{0}'.format(mtbc_fasta.id), media_type='text/plain', filename="{0}.nwk".format(mtbc_fasta.id))
+    return FileResponse(path='nj_tree/{0}-nj'.format(mtbc_fasta.id), media_type='text/plain', filename="{0}.nwk".format(mtbc_fasta.id))
+
+@test.get("/mtbc_ml_tree")
+async def ml_tree(select_mycobacterium_canettii: bool = False,
+                  select_mycobacterium_mungi: bool = False,
+                  select_mycobacterium_orygis: bool = False,
+                  select_mycobacterium_tuberculosis: bool = False,
+                  outgroup: str = '',
+                  list_length: int = 10,
+                  email: str = 'A.N.Other@example.com'):
+    mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(select_mycobacterium_canettii=select_mycobacterium_canettii,
+                                           select_mycobacterium_mungi=select_mycobacterium_mungi,
+                                           select_mycobacterium_orygis=select_mycobacterium_orygis,
+                                           select_mycobacterium_tuberculosis=select_mycobacterium_tuberculosis,
+                                           outgroup=outgroup,
+                                           list_length=list_length,
+                                           email=email)
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(mtbc_inst)
+    mtbc_fasta.align_reconstruct()
+    mtbc_fasta.create_ml_tree()
+    return FileResponse(path='ml_tree/{0}'.format(mtbc_fasta.id), media_type='text/plain',
+                        filename="{0}-ml.nwk".format(mtbc_fasta.id))
 
 
 if __name__ == "__main__":

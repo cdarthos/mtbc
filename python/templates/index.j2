@@ -41,22 +41,34 @@
                         <th>SRA_list</th>
                         <th>alignement</th>
                         <th>NJ_tree</th>
+                        <th>ML_tree</th>
                         <th>ncbi size</th>
                     </tr>
                     </thead>
                 {% for sra in sra_list if 'request' not in sra %}
                     <tr>
                     <td>
-                    <a href="/download_sra?json_file={{ sra }}">{{ sra }}</a>
+                    <a href="/download_sra?id={{ sra }}">{{ sra }}</a>
                     </td>
                     <td>
                     {%  if sra in fasta %}
-                    <a href="/download_fasta?fasta={{ sra }}">{{ sra }}</a>
+                    <a href="/download_fasta?id={{ sra }}">{{ sra }}</a>
+                    {% else %}
+                    <a href="/mtbc_fasta_align_from_json?json_file={{ sra }}" onclick="window.location.reload(true);">launch</a>
                     {% endif %}
                     </td>
                     <td>
                     {%  if sra in nj_tree %}
-                    <a href="/download_nj_tree?fasta={{ sra }}">{{ sra }}</a>
+                    <a href="/download_nj_tree?id={{ sra }}">{{ sra }}</a>
+                    {% else %}
+                    <a href="/mtbc_nj_tree_from_fasta?json_file={{ sra }}" onclick="window.location.reload(true);">launch</a>
+                    {% endif %}
+                    </td>
+                    <td>
+                    {%  if sra in ml_tree %}
+                    <a href="/download_ml_tree?id={{ sra }}">{{ sra }}</a>
+                    {% else %}
+                    <a href="/mtbc_ml_tree_from_fasta?json_file={{ sra }}" onclick="window.location.reload(true);">launch</a>
                     {% endif %}
                     </td>
                     <td>

@@ -40,6 +40,8 @@ class MtbcGetRandomSRA:
                  all_id_to_acc=False):
 
         # initial user variable
+
+        self.sample_list = None
         self.all_id_to_acc = all_id_to_acc
         self.outgroup = outgroup
         self.list_length = list_length
@@ -51,6 +53,7 @@ class MtbcGetRandomSRA:
                             self.taxa_mycobacterium_tuberculosis: select_mycobacterium_tuberculosis}
 
         # initialize empty variable
+        self.ml_tree = None
         self.nj_tree = None
         self.ncbi_random_acc_list = []
         self.ncbi_random_id_list = None

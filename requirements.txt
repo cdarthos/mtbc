@@ -6,3 +6,4 @@ Flask~=2.2.2
 fastapi~=0.88.0
 uvicorn~=0.20.0
 scikit-learn~=1.2.0
+DendroPy~=4.5.2
