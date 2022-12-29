@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Page Title</title>
+<meta http-equiv="refresh" content="10">
 <style>
 
 #customers {
@@ -54,21 +56,21 @@
                     {%  if sra in fasta %}
                     <a href="/download_fasta?id={{ sra }}">{{ sra }}</a>
                     {% else %}
-                    <a href="/mtbc_fasta_align_from_json?json_file={{ sra }}" onclick="window.location.reload(true);">launch</a>
+                    <a href="/mtbc_fasta_align_from_json?json_file={{ sra }}">launch</a>
                     {% endif %}
                     </td>
                     <td>
                     {%  if sra in nj_tree %}
                     <a href="/download_nj_tree?id={{ sra }}">{{ sra }}</a>
                     {% else %}
-                    <a href="/mtbc_nj_tree_from_fasta?json_file={{ sra }}" onclick="window.location.reload(true);">launch</a>
+                    <a href="/mtbc_nj_tree_from_fasta?json_file={{ sra }}">launch</a>
                     {% endif %}
                     </td>
                     <td>
                     {%  if sra in ml_tree %}
                     <a href="/download_ml_tree?id={{ sra }}">{{ sra }}</a>
                     {% else %}
-                    <a href="/mtbc_ml_tree_from_fasta?json_file={{ sra }}" onclick="window.location.reload(true);">launch</a>
+                    <a href="/mtbc_ml_tree_from_fasta?json_file={{ sra }}">launch</a>
                     {% endif %}
                     </td>
                     <td>

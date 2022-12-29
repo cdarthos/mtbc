@@ -49,11 +49,11 @@ class MtbcAcclistToFASTA:
         self.to_json_file()
 
     def mtbc_request(self):
-        acc_list_len = len(self.acc_list)
+        ncbi_random_acc_list_len = len(self.ncbi_random_acc_list)
         index = 1
         log.info("mtbc_request")
-        for sra in self.acc_list:
-            logging.info(str(index) + "/" + str(acc_list_len))
+        for sra in self.ncbi_random_acc_list:
+            logging.info(str(index) + "/" + str(ncbi_random_acc_list_len))
             index += 1
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
