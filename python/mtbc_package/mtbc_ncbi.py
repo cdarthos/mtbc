@@ -7,25 +7,55 @@ from operator import itemgetter
 import pandas as pd
 import xmltodict
 from Bio import Entrez
+from pymongo import MongoClient
 from sklearn.utils import shuffle
 # from types import SimpleNamespace
 from .custom_encoder import customEncoder
 
 log = logging.getLogger("mtbc_ncbi")
 
+class MtbcData:
+    def __init__(self):
+
+        # initial user variable
+
+        self.sample_list = None
+        self.all_id_to_acc = None
+        self.outgroup = None
+        self.list_length = None
+        Entrez.email = None
+        self.email = None
+        self.select_taxa = {self.taxa_mycobacterium_canettii: None,
+                            self.taxa_mycobacterium_mungi: None,
+                            self.taxa_mycobacterium_orygis: None,
+                            self.taxa_mycobacterium_tuberculosis: None}
+
+        # initialize empty variable
+        self.ml_tree = None
+        self.nj_tree = None
+        self.ncbi_random_acc_list = []
+        self.ncbi_random_id_list = None
+        self.ncbi_all_id = None
+        self.ncbi_request_all_id = None
+        self.align_with_alignIO = None
+        self.df_mutation = None
+        self.sequence_dict = {}
+        #self.alignement = {}
+        self.fasta = ""
+
+        self._id = ""
+
+
+
 class MtbcGetRandomSRA:
     # Mycobacterium tuberculosis complex 77643
     taxa_mycobacterium_tuberculosis_complex = '77643'
-
     # Mycobacterium canettii 78331
     taxa_mycobacterium_canettii = '78331'
-
     # Mycobacterium mungi 1844474
     taxa_mycobacterium_mungi = '1844474'
-
     # Mycobacterium orygis 1305738
     taxa_mycobacterium_orygis = '1305738'
-
     # Mycobacterium tuberculosis 1773
     taxa_mycobacterium_tuberculosis = '1773'
 
@@ -40,7 +70,6 @@ class MtbcGetRandomSRA:
                  all_id_to_acc=False):
 
         # initial user variable
-
         self.sample_list = None
         self.all_id_to_acc = all_id_to_acc
         self.outgroup = outgroup
@@ -62,9 +91,9 @@ class MtbcGetRandomSRA:
         self.align_with_alignIO = None
         self.df_mutation = None
         self.sequence_dict = {'NC_000962.3': {}}
-        self.alignement = {}
+        self.fasta = None
 
-        self.id = str(uuid.uuid4()) + "_" + str(list_length)
+        self._id = str(uuid.uuid4()) + "_" + str(list_length)
 
         # main program
         self.construct_search_request()
@@ -79,9 +108,10 @@ class MtbcGetRandomSRA:
         log.info("self.acc_list")
 
         log.info(len(self.ncbi_random_acc_list))
-        self.to_json_file()
+
 
     def construct_search_request(self):
+        log.info("construct_search_request")
         if True in self.select_taxa.values():
             self.ncbi_request_all_id = " OR ".join(
                 'txid' + key + '[ORGN]' for key, value in self.select_taxa.items() if value)
@@ -90,6 +120,7 @@ class MtbcGetRandomSRA:
             self.ncbi_request_all_id = 'txid' + self.taxa_mycobacterium_tuberculosis_complex + '[ORGN]'
 
     def get_all_id(self):
+        log.info("get_all_id")
         retmax = 1000000
         handle = Entrez.esearch(db="sra",
                                 term=self.ncbi_request_all_id,
@@ -100,9 +131,11 @@ class MtbcGetRandomSRA:
         self.ncbi_all_id = record['IdList']
 
     def get_random_acc_list_DEV(self):
+        log.info("get_random_acc_list_DEV")
         shuffled_id_list = shuffle(self.ncbi_all_id)
 
     def select_random_ncbi_id_number(self):
+        log.info("select_random_ncbi_id_number")
         self.ncbi_random_id_list = random.choices(self.ncbi_all_id,
                                                   k=self.list_length)
 
@@ -162,13 +195,25 @@ class MtbcGetRandomSRA:
 
     def to_json_file(self):
         self.ncbi_all_id = None
-        with open("request/{0}".format(self.id), 'w') as json_request:
+
+        with open("request/{0}".format(self._id), 'w') as json_request:
             json.dump(self, json_request, cls=customEncoder)
 
     def to_json(self):
         self.ncbi_all_id = None
-        #return json.dumps(self, cls=customEncoder)
         return self.__dict__
+
+    def to_db(self):
+        self.ncbi_all_id = None
+        try:
+            client = MongoClient('mongodb://localhost:27017/')
+            db_mtbc = client.db_mtbc
+            request_data = db_mtbc.request_data
+        except:
+            log.error("error to connect mongo db")
+        get_id = request_data.insert_one(self.to_json()).inserted_id
+        log.info(get_id)
+        client.close()
 
 
 if __name__ == "__main__":

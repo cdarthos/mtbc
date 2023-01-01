@@ -1,5 +1,8 @@
 FROM python:3.9
 
+RUN apt-get update && apt install -y raxml
+
+
 WORKDIR /code
 
 COPY requirements.txt /code/requirements.txt

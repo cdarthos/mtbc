@@ -13,3 +13,11 @@ services:
         - .:/code/
     ports:
         - "80:80"
+
+  mongodb:
+    image: mongo:5.0
+
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./data:/data/db

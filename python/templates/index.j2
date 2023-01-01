@@ -50,27 +50,27 @@
                 {% for sra in sra_list if 'request' not in sra %}
                     <tr>
                     <td>
-                    <a href="/download_sra?id={{ sra }}">{{ sra }}</a>
+                    <a href="/download_sra/{{ sra }}">{{ sra }}</a>
                     </td>
                     <td>
                     {%  if sra in fasta %}
-                    <a href="/download_fasta?id={{ sra }}">{{ sra }}</a>
+                    <a href="/download_fasta/{{ sra }}">{{ sra }}</a>
                     {% else %}
-                    <a href="/mtbc_fasta_align_from_json?json_file={{ sra }}">launch</a>
+                    <a href="/mtbc_fasta_align_from_json?id={{ sra }}">launch</a>
                     {% endif %}
                     </td>
                     <td>
                     {%  if sra in nj_tree %}
-                    <a href="/download_nj_tree?id={{ sra }}">{{ sra }}</a>
+                    <a href="/download_nj_tree/{{ sra }}">{{ sra }}</a>
                     {% else %}
-                    <a href="/mtbc_nj_tree_from_fasta?json_file={{ sra }}">launch</a>
+                    <a href="/mtbc_nj_tree_from_db/{{ sra }}">launch</a>
                     {% endif %}
                     </td>
                     <td>
                     {%  if sra in ml_tree %}
-                    <a href="/download_ml_tree?id={{ sra }}">{{ sra }}</a>
+                    <a href="/download_ml_tree/{{ sra }}">{{ sra }}</a>
                     {% else %}
-                    <a href="/mtbc_ml_tree_from_fasta?json_file={{ sra }}">launch</a>
+                    <a href="/mtbc_ml_tree_from_db/{{ sra }}">launch</a>
                     {% endif %}
                     </td>
                     <td>
