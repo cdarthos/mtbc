@@ -144,7 +144,7 @@ class MtbcTree:
         data = dendropy.DnaCharacterMatrix.get(
             data = fasta, schema="fasta")
         log.info("data")
-        log.info(data)
+        #log.info(data)
         rx = raxml.RaxmlRunner()
         ml_tree = rx.estimate_tree(
             char_matrix=data,

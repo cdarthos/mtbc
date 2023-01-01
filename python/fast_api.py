@@ -177,7 +177,6 @@ async def fasta_align_from_json(id: str = ""):
         request_data = db_mtbc.request_data
     except:
         logger.error("error to connect mongo db")
-    print("fasta_align_from_json : " + mtbc_fasta.fasta)
     request_data.update_one(
         {"_id": id},
         {"$set": {"sequence_dict": mtbc_fasta.sequence_dict,
