@@ -172,7 +172,7 @@ async def fasta_align_from_json(id: str = ""):
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj)
 
     try:
-        client = MongoClient('mongodb://localhost:27017/')
+        client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
     except:
@@ -220,7 +220,7 @@ async def nj_tree_from_db(id: str = ""):
 
         nj_tree = mtbc_tools.MtbcTree.create_nj_tree_static(id, fasta)
         try:
-            client = MongoClient('mongodb://localhost:27017/')
+            client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
             request_data = db_mtbc.request_data
         except:
@@ -263,7 +263,7 @@ async def ml_tree_from_db(id: str = ""):
 
         ml_tree = mtbc_tools.MtbcTree.create_ml_tree_static(id, fasta)
         try:
-            client = MongoClient('mongodb://localhost:27017/')
+            client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
             request_data = db_mtbc.request_data
         except:
