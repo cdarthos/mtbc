@@ -88,7 +88,7 @@ class MtbcAcclistToFASTA:
 
         cat_type = CategoricalDtype(categories=list("ATCG"))
         df_mutation = pandas.DataFrame.from_dict(self.sequence_dict, dtype=cat_type)
-        log.info(df_mutation.info(memory_usage="deep"))
+        log.debug(df_mutation.info(memory_usage="deep"))
 
         handle = io.StringIO()
         for column in df_mutation.columns:
@@ -98,8 +98,6 @@ class MtbcAcclistToFASTA:
 
 
         self.fasta = handle.getvalue()
-        print(self.fasta)
-        print(handle)
 
 
     def to_db(self):

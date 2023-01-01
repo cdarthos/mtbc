@@ -43,13 +43,13 @@ async def root(request: Request):
     db_sra_list = request_data.find().distinct("_id")
 
     db_nj_tree = request_data.find({"nj_tree":{"$ne":None}}).distinct("_id")
-    print(db_nj_tree)
+
 
     db_ml_tree = request_data.find({"ml_tree":{"$ne":None}}).distinct("_id")
-    print(db_ml_tree)
+
 
     db_fasta = request_data.find({"fasta":{"$ne":None}}).distinct("_id")
-    print(db_fasta)
+
 
 
     client.close()
@@ -84,7 +84,7 @@ async def download_fasta(id: str = ''):
 
     resultat = request_data.find_one({"_id": id})["fasta"]
     client.close()
-    logging.info(resultat)
+
 
 
     response = Response(resultat, media_type='text/plain')
