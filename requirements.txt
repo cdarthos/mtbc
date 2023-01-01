@@ -8,3 +8,5 @@ uvicorn~=0.20.0
 scikit-learn~=1.2.0
 DendroPy~=4.5.2
 pymongo~=4.3.3
+starlette~=0.22.0
+pydantic~=1.10.2
