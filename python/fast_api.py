@@ -11,15 +11,14 @@ from starlette.responses import Response, RedirectResponse
 from mtbc_package import mtbc_ncbi, mtbc_tools
 from settings import mongoSettings
 
-
 FORMAT = "%(levelname)s:%(message)s"
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 mongosettings = mongoSettings()
 
 templates = Jinja2Templates(directory="templates")
-#logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 logging.info("Start fastapi")
 test = FastAPI()
 
@@ -169,12 +168,11 @@ async def fasta_align_from_json(id: str = ""):
     #     {"_id": id},
     #     {"$set": {"fasta": mtbc_fasta.fasta}})""")
     request_data.update_one(
-       {"_id": id},
-       {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})
+        {"_id": id},
+        {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})
     logging.info("""request_data.update_one(
        {"_id": id},
        {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})""")
-
 
     client.close()
     return mtbc_fasta.fasta

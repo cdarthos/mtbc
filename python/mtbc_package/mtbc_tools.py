@@ -29,8 +29,9 @@ class MtbcAcclistToFASTA:
         self._id = mtbc_get_random_sra._id
 
 
-        self.sequence_dict = {'NC_000962.3': {}}
-        self.mtbc_request()
+        self.sequence_dict = mtbc_get_random_sra.sequence_dict
+        if len(self.sequence_dict) < 2:
+            self.mtbc_request()
         logging.info("self.sequence")
         logging.debug(self.sequence_dict)
         self.reconstruct_sequence_to_fasta_file()
