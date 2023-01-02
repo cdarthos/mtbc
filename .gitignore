@@ -1,10 +1,1 @@
-/python/alignement/reconstruct_sequence.fasta
-/python/nj_tree/tree1.nwk
-/python/alignement/*.fasta
-/python/tree/*.nwk
-/hs_err_pid8204.log
-/python/alignement/*.meg
-/python/alignement/*.meg
-/python/alignement/*.mas
-/python/alignement/*.nwk
 /venv/
