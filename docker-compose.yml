@@ -8,11 +8,12 @@ services:
       dockerfile: Dockerfile
     restart: always
     volumes:
-        - ./python/alignement:/code/python/alignement
-        - ./python/nj_tree:/code/python/nj_tree
-        - .:/code/
+      - .:/code/
     ports:
-        - "80:80"
+      - "80:80"
+    environment:
+      - MONGO_HOST=mongodb
+
 
   mongodb:
     image: mongo:5.0

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from types import SimpleNamespace
 
 import uvicorn
@@ -15,7 +16,7 @@ mongosettings = mongoSettings()
 templates = Jinja2Templates(directory="templates")
 logger = logging.getLogger("fastapi")
 logger.setLevel(logging.DEBUG)
-
+logger.info("Start fastapi")
 test = FastAPI()
 
 

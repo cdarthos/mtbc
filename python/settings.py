@@ -1,6 +1,8 @@
+import os
+
 from pydantic import BaseSettings
 
 
 class mongoSettings(BaseSettings):
-    host: str = "localhost"
+    host: str = os.environ['MONGO_HOST']
     port: int = 27017
