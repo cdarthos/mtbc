@@ -9,11 +9,10 @@ import xmltodict
 from Bio import Entrez
 from pymongo import MongoClient
 from sklearn.utils import shuffle
-# from types import SimpleNamespace
-from .custom_encoder import customEncoder
+
 
 log = logging.getLogger("mtbc_ncbi")
-
+log.setLevel(logging.DEBUG)
 class MtbcData:
     def __init__(self):
 
@@ -153,7 +152,6 @@ class MtbcGetRandomSRA:
         log.debug(record_epost['WebEnv'])
 
         for start in range(0, len(self.ncbi_all_id), 5000):
-            print(start)
             handle_esummary = Entrez.esummary(db="sra",
                                               query_key=record_epost['QueryKey'],
                                               WebEnv=record_epost['WebEnv'],
@@ -193,11 +191,7 @@ class MtbcGetRandomSRA:
     def add_outgroup(self):
         self.ncbi_random_acc_list.append(self.outgroup)
 
-    def to_json_file(self):
-        self.ncbi_all_id = None
 
-        with open("request/{0}".format(self._id), 'w') as json_request:
-            json.dump(self, json_request, cls=customEncoder)
 
     def to_json(self):
         self.ncbi_all_id = None

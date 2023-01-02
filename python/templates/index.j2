@@ -1,88 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Page Title</title>
-<meta http-equiv="refresh" content="10">
-<style>
+    <title>Page Title</title>
+    <meta http-equiv="refresh" content="10">
+    <style>
 
-#customers {
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
+        #customers {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
 
-#customers td, #customers th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
+        #customers td, #customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
 
-#customers tr:nth-child(even){background-color: #f2f2f2;}
+        #customers tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
 
-#customers tr:hover {background-color: #ddd;}
+        #customers tr:hover {
+            background-color: #ddd;
+        }
 
-#customers th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #04AA6D;
-  color: white;
-}
+        #customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #04AA6D;
+            color: white;
+        }
 
-</style>
+    </style>
 </head>
 <body>
-
+<iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
 
 <a href="/docs">/docs#</a>
-    <div>
+<div>
 
-            <div class="task">
-                <table id="customers">
-                    <thead>
-                    <tr>
-                        <th>SRA_list</th>
-                        <th>alignement</th>
-                        <th>NJ_tree</th>
-                        <th>ML_tree</th>
-                        <th>ncbi size</th>
-                    </tr>
-                    </thead>
-                {% for sra in sra_list if 'request' not in sra %}
-                    <tr>
+    <div class="task">
+        <table id="customers">
+            <thead>
+            <tr>
+                <th>SRA_list</th>
+                <th>alignement</th>
+                <th>NJ_tree</th>
+                <th>ML_tree</th>
+                <th>ncbi size</th>
+            </tr>
+            </thead>
+            <tr>
+                <td>
+                    <form action="/mtbc_sra_list" method="post" target="dummyframe">
+                        <button>Get default SRA random list</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/docs#/default/set_param_mtbc_sra_list_post" method="get">
+                        <button type="submit">edit SRA random list parameter</button>
+                    </form>
+                </td>
+            </tr>
+            {% for sra in sra_list if 'request' not in sra %}
+                <tr>
                     <td>
-                    <a href="/download_sra/{{ sra }}">{{ sra }}</a>
+                        <a href="/download_sra/{{ sra }}">{{ sra }}</a>
                     </td>
                     <td>
-                    {%  if sra in fasta %}
-                    <a href="/download_fasta/{{ sra }}">{{ sra }}</a>
-                    {% else %}
-                    <a href="/mtbc_fasta_align_from_json?id={{ sra }}">launch</a>
-                    {% endif %}
+                        {% if sra in fasta %}
+                            <a href="/download_fasta/{{ sra }}">{{ sra }}</a>
+                        {% else %}
+                            <a href="/mtbc_fasta_align_from_json?id={{ sra }}">launch</a>
+                        {% endif %}
                     </td>
                     <td>
-                    {%  if sra in nj_tree %}
-                    <a href="/download_nj_tree/{{ sra }}">{{ sra }}</a>
-                    {% else %}
-                    <a href="/mtbc_nj_tree_from_db/{{ sra }}">launch</a>
-                    {% endif %}
+                        {% if sra in nj_tree %}
+                            <a href="/download_nj_tree/{{ sra }}">{{ sra }}</a>
+                        {% else %}
+                            <a href="/mtbc_nj_tree_from_db/{{ sra }}">launch</a>
+                        {% endif %}
                     </td>
                     <td>
-                    {%  if sra in ml_tree %}
-                    <a href="/download_ml_tree/{{ sra }}">{{ sra }}</a>
-                    {% else %}
-                    <a href="/mtbc_ml_tree_from_db/{{ sra }}">launch</a>
-                    {% endif %}
+                        {% if sra in ml_tree %}
+                            <a href="/download_ml_tree/{{ sra }}">{{ sra }}</a>
+                        {% else %}
+                            <a href="/mtbc_ml_tree_from_db/{{ sra }}">launch</a>
+                        {% endif %}
                     </td>
                     <td>
                         {% set size = sra.split("_")[1] %}
                         <a>{{ size }}</a>
                     </td>
-                    </tr>
-                {% endfor %}
-                </table>
-            </div>
-
+                </tr>
+            {% endfor %}
+        </table>
     </div>
+
+</div>
 
 </body>
 </html>

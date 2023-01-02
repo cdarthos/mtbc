@@ -14,7 +14,6 @@ from .mtbc_ncbi import MtbcGetRandomSRA
 import dendropy
 from dendropy.interop import raxml
 
-
 log = logging.getLogger("mtbc_tool")
 
 
@@ -25,41 +24,23 @@ class MtbcAcclistToFASTA:
 
         # initial user variable
         self.fasta = None
-        self.ml_tree = mtbc_get_random_sra.ml_tree
-        self.list_length = mtbc_get_random_sra.list_length
-        Entrez.email = mtbc_get_random_sra.email
-        self.email = mtbc_get_random_sra.email
-        self.select_taxa = vars(mtbc_get_random_sra.select_taxa)
-
-        # initialize empty variable
-
-        self.nj_tree = mtbc_get_random_sra.nj_tree
         self.ncbi_random_acc_list = mtbc_get_random_sra.ncbi_random_acc_list
-        self.sample_list = mtbc_get_random_sra.sample_list
-        self.ncbi_all_id = None
-        self.ncbi_request_all_id = mtbc_get_random_sra.ncbi_request_all_id
-        self.align_with_alignIO = mtbc_get_random_sra.align_with_alignIO
         self.df_mutation = mtbc_get_random_sra.df_mutation
         self._id = mtbc_get_random_sra._id
         self.sequence_dict = {'NC_000962.3': {}}
-        # self.alignement = {}
-
-
         self.mtbc_request()
         log.info("self.sequence")
         log.debug(self.sequence_dict)
-
         self.reconstruct_sequence_to_fasta_file()
 
-        # self.to_json_file()
-        # self.to_db()
 
     def mtbc_request(self):
         ncbi_random_acc_list_len = len(self.ncbi_random_acc_list)
         index = 1
         log.info("mtbc_request")
+
         for sra in self.ncbi_random_acc_list:
-            logging.info(str(index) + "/" + str(ncbi_random_acc_list_len))
+            log.info(str(index) + "/" + str(ncbi_random_acc_list_len))
             index += 1
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
@@ -96,27 +77,9 @@ class MtbcAcclistToFASTA:
             handle.write(">" + column + "\n")
             handle.write("".join(df_mutation[column].to_list()) + "\n")
 
-
         self.fasta = handle.getvalue()
 
-
-    def to_db(self):
-        self.ncbi_all_id = None
-        try:
-            client = MongoClient('mongodb://localhost:27017/')
-            db_mtbc = client.db_mtbc
-            request_data = db_mtbc.request_data
-        except:
-            log.error("error to connect mongo db")
-
-        get_id = request_data.update_one(
-            {"_id": self._id},
-            {"$set": self.to_json()})
-        log.info(get_id)
-        client.close()
-
     def to_json(self):
-        self.ncbi_all_id = None
         return self.__dict__
 
 
@@ -127,7 +90,6 @@ class MtbcTree:
         calculator = DistanceCalculator('identity')
         handle_fasta = io.StringIO(fasta)
         align = AlignIO.read(handle_fasta, 'fasta')
-        #align = AlignIO.read('alignement/{0}'.format(id), 'fasta')
         dist_matrix = calculator.get_distance(align)
         log.info("dist_matrix")
         log.debug(dist_matrix)
@@ -142,9 +104,8 @@ class MtbcTree:
     def create_ml_tree_static(id, fasta):
         log.info("create_ml_tree_static")
         data = dendropy.DnaCharacterMatrix.get(
-            data = fasta, schema="fasta")
+            data=fasta, schema="fasta")
         log.info("data")
-        #log.info(data)
         rx = raxml.RaxmlRunner()
         ml_tree = rx.estimate_tree(
             char_matrix=data,
@@ -154,5 +115,4 @@ class MtbcTree:
         return ml_tree_str
 
     def to_json(self):
-        self.ncbi_all_id = None
         return self.__dict__
