@@ -108,7 +108,7 @@ class MtbcGetRandomSRA:
         self.acc_number_from_ncbi_id()
         logging.info("self.acc_list")
 
-        logging.info(len(self.ncbi_random_acc_list))
+
 
 
     def construct_search_request(self):
@@ -176,7 +176,7 @@ class MtbcGetRandomSRA:
                                           )
         record_esummary = Entrez.read(handle_esummary)
         logging.info("record_esummary")
-        logging.info(record_esummary)
+        logging.debug(record_esummary)
         handle_esummary.close()
 
         runs = list(map(itemgetter('Runs'),
