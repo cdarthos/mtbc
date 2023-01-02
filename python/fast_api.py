@@ -14,7 +14,7 @@ from settings import mongoSettings
 mongosettings = mongoSettings()
 
 templates = Jinja2Templates(directory="templates")
-logger = logging.getLogger("fastapi")
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.info("Start fastapi")
 test = FastAPI()
