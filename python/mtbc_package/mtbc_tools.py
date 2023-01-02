@@ -27,6 +27,8 @@ class MtbcAcclistToFASTA:
         self.ncbi_random_acc_list = mtbc_get_random_sra.ncbi_random_acc_list
         self.df_mutation = mtbc_get_random_sra.df_mutation
         self._id = mtbc_get_random_sra._id
+
+
         self.sequence_dict = {'NC_000962.3': {}}
         self.mtbc_request()
         logging.info("self.sequence")
