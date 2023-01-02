@@ -162,18 +162,18 @@ async def fasta_align_from_json(id: str = ""):
         request_data = db_mtbc.request_data
     except:
         logging.error("error to connect mongo db")
+    # request_data.update_one(
+    #     {"_id": id},
+    #     {"$set": {"fasta": mtbc_fasta.fasta}})
+    # logging.info("""request_data.update_one(
+    #     {"_id": id},
+    #     {"$set": {"fasta": mtbc_fasta.fasta}})""")
     request_data.update_one(
-        {"_id": id},
-        {"$set": {"fasta": mtbc_fasta.fasta}})
+       {"_id": id},
+       {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})
     logging.info("""request_data.update_one(
-        {"_id": id},
-        {"$set": {"fasta": mtbc_fasta.fasta}})""")
-    #request_data.update_one(
-    #    {"_id": id},
-    #    {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})
-    #logging.info("""request_data.update_one(
-    #    {"_id": id},
-    #    {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})""")
+       {"_id": id},
+       {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})""")
 
 
     client.close()
