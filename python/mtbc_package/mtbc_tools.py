@@ -14,8 +14,8 @@ from .mtbc_ncbi import MtbcGetRandomSRA
 import dendropy
 from dendropy.interop import raxml
 
-log = logging.getLogger("mtbc_tool")
-
+FORMAT = "%(levelname)s:%(message)s"
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 class MtbcAcclistToFASTA:
 
@@ -29,18 +29,18 @@ class MtbcAcclistToFASTA:
         self._id = mtbc_get_random_sra._id
         self.sequence_dict = {'NC_000962.3': {}}
         self.mtbc_request()
-        log.info("self.sequence")
-        log.debug(self.sequence_dict)
+        logging.info("self.sequence")
+        logging.debug(self.sequence_dict)
         self.reconstruct_sequence_to_fasta_file()
 
 
     def mtbc_request(self):
         ncbi_random_acc_list_len = len(self.ncbi_random_acc_list)
         index = 1
-        log.info("mtbc_request")
+        logging.info("mtbc_request")
 
         for sra in self.ncbi_random_acc_list:
-            log.info(str(index) + "/" + str(ncbi_random_acc_list_len))
+            logging.info(str(index) + "/" + str(ncbi_random_acc_list_len))
             index += 1
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
@@ -54,7 +54,7 @@ class MtbcAcclistToFASTA:
             r = requests.post(url, parameters, head)
 
             if len(r.text) != 0:
-                log.info(r.text[1:].split("\n")[0])
+                logging.info(r.text[1:].split("\n")[0])
                 self.sequence_dict[r.text[1:].split("\n")[0]] = {}
                 for diff in r.text.split("\n")[2:]:
                     if len(diff) != 0:
@@ -69,7 +69,7 @@ class MtbcAcclistToFASTA:
 
         cat_type = CategoricalDtype(categories=list("ATCG"))
         df_mutation = pandas.DataFrame.from_dict(self.sequence_dict, dtype=cat_type)
-        log.debug(df_mutation.info(memory_usage="deep"))
+        logging.debug(df_mutation.info(memory_usage="deep"))
 
         handle = io.StringIO()
         for column in df_mutation.columns:
@@ -86,13 +86,13 @@ class MtbcAcclistToFASTA:
 class MtbcTree:
 
     def create_nj_tree_static(id, fasta):
-        log.info("create_nj_tree_static")
+        logging.info("create_nj_tree_static")
         calculator = DistanceCalculator('identity')
         handle_fasta = io.StringIO(fasta)
         align = AlignIO.read(handle_fasta, 'fasta')
         dist_matrix = calculator.get_distance(align)
-        log.info("dist_matrix")
-        log.debug(dist_matrix)
+        logging.info("dist_matrix")
+        logging.debug(dist_matrix)
         constructor = DistanceTreeConstructor()
         nj_tree = constructor.nj(dist_matrix)
         handle = io.StringIO()
@@ -102,16 +102,16 @@ class MtbcTree:
         return resultat
 
     def create_ml_tree_static(id, fasta):
-        log.info("create_ml_tree_static")
+        logging.info("create_ml_tree_static")
         data = dendropy.DnaCharacterMatrix.get(
             data=fasta, schema="fasta")
-        log.info("data")
+        logging.info("data")
         rx = raxml.RaxmlRunner()
         ml_tree = rx.estimate_tree(
             char_matrix=data,
             raxml_args=["--no-bfgs"])
         ml_tree_str = ml_tree.as_string(schema="newick")
-        log.info(ml_tree_str)
+        logging.info(ml_tree_str)
         return ml_tree_str
 
     def to_json(self):

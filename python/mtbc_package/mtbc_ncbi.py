@@ -10,9 +10,11 @@ from Bio import Entrez
 from pymongo import MongoClient
 from sklearn.utils import shuffle
 
+FORMAT = "%(levelname)s:%(message)s"
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 
-log = logging.getLogger("mtbc_ncbi")
-log.setLevel(logging.DEBUG)
+
+
 class MtbcData:
     def __init__(self):
 
@@ -96,21 +98,21 @@ class MtbcGetRandomSRA:
 
         # main program
         self.construct_search_request()
-        log.info("self.ncbi_request_all_id")
+        logging.info("self.ncbi_request_all_id")
         self.get_all_id()
-        log.info("self.ncbi_all_id")
+        logging.info("self.ncbi_all_id")
 
         self.select_random_ncbi_id_number()
-        log.info("self.sample_list")
+        logging.info("self.sample_list")
 
         self.acc_number_from_ncbi_id()
-        log.info("self.acc_list")
+        logging.info("self.acc_list")
 
-        log.info(len(self.ncbi_random_acc_list))
+        logging.info(len(self.ncbi_random_acc_list))
 
 
     def construct_search_request(self):
-        log.info("construct_search_request")
+        logging.info("construct_search_request")
         if True in self.select_taxa.values():
             self.ncbi_request_all_id = " OR ".join(
                 'txid' + key + '[ORGN]' for key, value in self.select_taxa.items() if value)
@@ -119,7 +121,7 @@ class MtbcGetRandomSRA:
             self.ncbi_request_all_id = 'txid' + self.taxa_mycobacterium_tuberculosis_complex + '[ORGN]'
 
     def get_all_id(self):
-        log.info("get_all_id")
+        logging.info("get_all_id")
         retmax = 1000000
         handle = Entrez.esearch(db="sra",
                                 term=self.ncbi_request_all_id,
@@ -130,11 +132,11 @@ class MtbcGetRandomSRA:
         self.ncbi_all_id = record['IdList']
 
     def get_random_acc_list_DEV(self):
-        log.info("get_random_acc_list_DEV")
+        logging.info("get_random_acc_list_DEV")
         shuffled_id_list = shuffle(self.ncbi_all_id)
 
     def select_random_ncbi_id_number(self):
-        log.info("select_random_ncbi_id_number")
+        logging.info("select_random_ncbi_id_number")
         self.ncbi_random_id_list = random.choices(self.ncbi_all_id,
                                                   k=self.list_length)
 
@@ -148,8 +150,8 @@ class MtbcGetRandomSRA:
         handle_epost = Entrez.epost(db="sra", id=",".join(map(str, self.ncbi_all_id)))
         record_epost = Entrez.read(handle_epost)
         handle_epost.close()
-        log.debug(record_epost)
-        log.debug(record_epost['WebEnv'])
+        #logging.debug(record_epost)
+        logging.debug(record_epost['WebEnv'])
 
         for start in range(0, len(self.ncbi_all_id), 5000):
             handle_esummary = Entrez.esummary(db="sra",
@@ -174,7 +176,7 @@ class MtbcGetRandomSRA:
                                           )
         record_esummary = Entrez.read(handle_esummary)
         logging.info("record_esummary")
-        log.info(record_esummary)
+        logging.info(record_esummary)
         handle_esummary.close()
 
         runs = list(map(itemgetter('Runs'),
@@ -204,12 +206,7 @@ class MtbcGetRandomSRA:
             db_mtbc = client.db_mtbc
             request_data = db_mtbc.request_data
         except:
-            log.error("error to connect mongo db")
+            logging.error("error to connect mongo db")
         get_id = request_data.insert_one(self.to_json()).inserted_id
-        log.info(get_id)
+        logging.info(get_id)
         client.close()
-
-
-if __name__ == "__main__":
-    mtbc_inst1 = MtbcGetRandomSRA(list_length=10)
-    # print(mtbc.to_json())

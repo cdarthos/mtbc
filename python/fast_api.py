@@ -11,16 +11,16 @@ from starlette.responses import Response, RedirectResponse
 from mtbc_package import mtbc_ncbi, mtbc_tools
 from settings import mongoSettings
 
-from fastapi.logger import logger
 
-
+FORMAT = "%(levelname)s:%(message)s"
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 mongosettings = mongoSettings()
 
 templates = Jinja2Templates(directory="templates")
 #logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-logger.info("Start fastapi")
+#logger.setLevel(logging.DEBUG)
+logging.info("Start fastapi")
 test = FastAPI()
 
 
@@ -70,7 +70,7 @@ async def download_fasta(id: str = ''):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
     except:
-        logger.error("error to connect mongo db")
+        logging.error("error to connect mongo db")
 
     resultat = request_data.find_one({"_id": id})["fasta"]
     client.close()
@@ -87,7 +87,7 @@ async def download_nj_tree(id: str = ''):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
     except:
-        logger.error("error to connect mongo db")
+        logging.error("error to connect mongo db")
 
     resultat = request_data.find_one({"_id": id})["nj_tree"]
     client.close()
@@ -104,7 +104,7 @@ async def download_ml_tree(id: str = ""):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
     except:
-        logger.error("error to connect mongo db")
+        logging.error("error to connect mongo db")
 
     resultat = request_data.find_one({"_id": id})["ml_tree"]
     client.close()
@@ -134,7 +134,7 @@ async def set_param(select_mycobacterium_canettii: bool = False,
     db_mtbc = client.db_mtbc
     request_data = db_mtbc.request_data
     get_id = request_data.insert_one(mtbc_inst.to_json()).inserted_id
-    logger.info(get_id)
+    logging.info(get_id)
     client.close()
     return mtbc_inst.to_json()
 
@@ -146,13 +146,13 @@ async def fasta_align_from_json(id: str = ""):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
     except:
-        logger.error("error to connect mongo db")
+        logging.error("error to connect mongo db")
     resultat = request_data.find_one({"_id": id})
     client.close()
 
     resultat_json = json.dumps(resultat)
     resultat_obj = json.loads(resultat_json, object_hook=lambda d: SimpleNamespace(**d))
-    logger.info(resultat_obj._id)
+    logging.info(resultat_obj._id)
 
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj)
 
@@ -161,7 +161,7 @@ async def fasta_align_from_json(id: str = ""):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
     except:
-        logger.error("error to connect mongo db")
+        logging.error("error to connect mongo db")
     request_data.update_one(
         {"_id": id},
         {"$set": {"sequence_dict": mtbc_fasta.sequence_dict,
@@ -177,7 +177,7 @@ async def nj_tree_from_db(id: str = ""):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
     except:
-        logger.error("error to connect mongo db")
+        logging.error("error to connect mongo db")
     resultat = request_data.find_one({"_id": id})["nj_tree"]
     fasta = request_data.find_one({"_id": id})["fasta"]
     client.close()
@@ -194,7 +194,7 @@ async def nj_tree_from_db(id: str = ""):
                 db_mtbc = client.db_mtbc
                 request_data = db_mtbc.request_data
             except:
-                logger.error("error to connect mongo db")
+                logging.error("error to connect mongo db")
             fasta = request_data.find_one({"_id": id})["fasta"]
             client.close()
 
@@ -204,7 +204,7 @@ async def nj_tree_from_db(id: str = ""):
             db_mtbc = client.db_mtbc
             request_data = db_mtbc.request_data
         except:
-            logger.error("error to connect mongo db")
+            logging.error("error to connect mongo db")
         request_data.update_one(
             {"_id": id},
             {"$set": {"nj_tree": nj_tree}})
@@ -219,7 +219,7 @@ async def ml_tree_from_db(id: str = ""):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
     except:
-        logger.error("error to connect mongo db")
+        logging.error("error to connect mongo db")
     resultat = request_data.find_one({"_id": id})["ml_tree"]
     fasta = request_data.find_one({"_id": id})["fasta"]
     client.close()
@@ -234,7 +234,7 @@ async def ml_tree_from_db(id: str = ""):
                 db_mtbc = client.db_mtbc
                 request_data = db_mtbc.request_data
             except:
-                logger.error("error to connect mongo db")
+                logging.error("error to connect mongo db")
             fasta = request_data.find_one({"_id": id})["fasta"]
             client.close()
 
@@ -244,7 +244,7 @@ async def ml_tree_from_db(id: str = ""):
             db_mtbc = client.db_mtbc
             request_data = db_mtbc.request_data
         except:
-            logger.error("error to connect mongo db")
+            logging.error("error to connect mongo db")
         request_data.update_one(
             {"_id": id},
             {"$set": {"ml_tree": ml_tree}})
