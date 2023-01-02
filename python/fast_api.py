@@ -15,7 +15,7 @@ from fastapi.logger import logger
 
 
 gunicorn_logger = logging.getLogger('gunicorn.error')
-logger.handlers = gunicorn_logger.handler
+logger.handlers = gunicorn_logger.handlers
 
 mongosettings = mongoSettings()
 
