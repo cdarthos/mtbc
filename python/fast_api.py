@@ -11,13 +11,14 @@ from starlette.responses import Response, RedirectResponse
 from mtbc_package import mtbc_ncbi, mtbc_tools
 from settings import mongoSettings
 
+from fastapi.logger import logger
 
 
 
 mongosettings = mongoSettings()
 
 templates = Jinja2Templates(directory="templates")
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.info("Start fastapi")
 test = FastAPI()
