@@ -168,12 +168,12 @@ async def fasta_align_from_json(id: str = ""):
     logging.info("""request_data.update_one(
         {"_id": id},
         {"$set": {"fasta": mtbc_fasta.fasta}})""")
-    request_data.update_one(
-        {"_id": id},
-        {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})
-    logging.info("""request_data.update_one(
-        {"_id": id},
-        {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})""")
+    #request_data.update_one(
+    #    {"_id": id},
+    #    {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})
+    #logging.info("""request_data.update_one(
+    #    {"_id": id},
+    #    {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})""")
 
 
     client.close()
