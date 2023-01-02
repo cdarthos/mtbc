@@ -152,8 +152,8 @@ async def fasta_align_from_json(id: str = ""):
     resultat_json = json.dumps(resultat)
     resultat_obj = json.loads(resultat_json, object_hook=lambda d: SimpleNamespace(**d))
     logging.info(resultat_obj._id)
-
-    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj)
+    sequence_dict = resultat["sequence_dict"]
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj, sequence_dict)
 
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
