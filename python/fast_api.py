@@ -154,27 +154,31 @@ async def fasta_align_from_json(id: str = ""):
     logging.info(resultat_obj._id)
     sequence_dict = resultat["sequence_dict"]
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj, sequence_dict)
-
+    logging.info("Preparation envoi à MongoDB")
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
+        logging.error("error to connect mongo db")
+        request_data.update_one(
+            {"_id": id},
+            {"$set": {"fasta": mtbc_fasta.fasta}})
+        logging.info("""request_data.update_one(
+            {"_id": id},
+            {"$set": {"fasta": mtbc_fasta.fasta}})""")
+        request_data.update_one(
+            {"_id": id},
+            {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})
+        logging.info("""request_data.update_one(
+            {"_id": id},
+            {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})""")
+
     except:
         logging.error("error to connect mongo db")
-    # request_data.update_one(
-    #     {"_id": id},
-    #     {"$set": {"fasta": mtbc_fasta.fasta}})
-    # logging.info("""request_data.update_one(
-    #     {"_id": id},
-    #     {"$set": {"fasta": mtbc_fasta.fasta}})""")
-    request_data.update_one(
-        {"_id": id},
-        {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})
-    logging.info("""request_data.update_one(
-       {"_id": id},
-       {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})""")
+    finally:
+        client.close()
+        logging.info("Mongodb connection close")
 
-    client.close()
     return mtbc_fasta.fasta
 
 
