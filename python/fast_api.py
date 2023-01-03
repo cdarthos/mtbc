@@ -36,6 +36,14 @@ async def root(request: Request):
 
     db_fasta = request_data.find({"fasta": {"$ne": None}}).distinct("_id")
 
+    tests = request_data.find({}, {"_id": 1, "fasta": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1})
+    #for test in tests:
+    #    logging.info(test)
+    #logging.info("\n")
+
+    test2 = list(tests)
+    logging.info(test2)
+
     client.close()
     return templates.TemplateResponse("index.j2",
                                       {"request": request, "fasta": db_fasta, "nj_tree": db_nj_tree,
@@ -162,7 +170,8 @@ async def fasta_align_from_json(id: str = ""):
     resultat_obj = json.loads(resultat_json, object_hook=lambda d: SimpleNamespace(**d))
     logging.info(resultat_obj._id)
     sequence_dict = resultat["sequence_dict"]
-    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj, sequence_dict, target_list_length=resultat["target_list_length"])
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj, sequence_dict,
+                                               target_list_length=resultat["target_list_length"])
     logging.info("Preparation envoi à MongoDB")
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
@@ -170,10 +179,10 @@ async def fasta_align_from_json(id: str = ""):
         request_data = db_mtbc.request_data
         request_data.update_one(
             {"_id": id},
-            {"$set": {"fasta": mtbc_fasta.final_acc_list_length}})
+            {"$set": {"final_acc_list_length": mtbc_fasta.final_acc_list_length}})
         request_data.update_one(
             {"_id": id},
-            {"$set": {"fasta": mtbc_fasta.final_acc_list}})
+            {"$set": {"final_acc_list": mtbc_fasta.final_acc_list}})
         request_data.update_one(
             {"_id": id},
             {"$set": {"fasta": mtbc_fasta.fasta}})
