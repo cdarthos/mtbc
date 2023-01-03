@@ -119,15 +119,23 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                     select_mycobacterium_orygis: bool = False,
                     select_mycobacterium_tuberculosis: bool = False,
                     outgroup: str = '',
-                    list_length: int = 10,
-                    email: str = 'A.N.Other@example.com'):
+                    ncbi_list_length: int = 100,
+                    email: str = 'A.N.Other@example.com',
+                    snp_select: list = [],
+                    snp_reject: list = [],
+                    target_list_length=10
+                    ):
     mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(select_mycobacterium_canettii=select_mycobacterium_canettii,
                                            select_mycobacterium_mungi=select_mycobacterium_mungi,
                                            select_mycobacterium_orygis=select_mycobacterium_orygis,
                                            select_mycobacterium_tuberculosis=select_mycobacterium_tuberculosis,
                                            outgroup=outgroup,
-                                           list_length=list_length,
-                                           email=email)
+                                           ncbi_list_length=ncbi_list_length,
+                                           email=email,
+                                           snp_select=snp_select,
+                                           snp_reject=snp_reject,
+                                           target_list_length=target_list_length
+                                           )
     logging.info("LOGGING")
     client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
     db_mtbc = client.db_mtbc
@@ -144,22 +152,28 @@ async def fasta_align_from_json(id: str = ""):
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
+        resultat = request_data.find_one({"_id": id})
     except:
         logging.error("error to connect mongo db")
-    resultat = request_data.find_one({"_id": id})
-    client.close()
+    finally:
+        client.close()
 
     resultat_json = json.dumps(resultat)
     resultat_obj = json.loads(resultat_json, object_hook=lambda d: SimpleNamespace(**d))
     logging.info(resultat_obj._id)
     sequence_dict = resultat["sequence_dict"]
-    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj, sequence_dict)
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj, sequence_dict, target_list_length=resultat["target_list_length"])
     logging.info("Preparation envoi à MongoDB")
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
-        logging.error("error to connect mongo db")
+        request_data.update_one(
+            {"_id": id},
+            {"$set": {"fasta": mtbc_fasta.final_acc_list_length}})
+        request_data.update_one(
+            {"_id": id},
+            {"$set": {"fasta": mtbc_fasta.final_acc_list}})
         request_data.update_one(
             {"_id": id},
             {"$set": {"fasta": mtbc_fasta.fasta}})
@@ -172,9 +186,9 @@ async def fasta_align_from_json(id: str = ""):
         logging.info("""request_data.update_one(
             {"_id": id},
             {"$set": {"sequence_dict": mtbc_fasta.sequence_dict}})""")
-
-    except:
+    except Exception as e:
         logging.error("error to connect mongo db")
+        logging.error(e)
     finally:
         client.close()
         logging.info("Mongodb connection close")

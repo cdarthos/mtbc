@@ -21,14 +21,18 @@ class MtbcAcclistToFASTA:
 
     def __init__(self,
                  mtbc_get_random_sra: MtbcGetRandomSRA,
-                 sequence_dict):
+                 sequence_dict,
+                 target_list_length):
 
         # initial user variable
+        self.final_acc_list_length = None
+        self.target_list_length = target_list_length
         self.fasta = None
         self.ncbi_random_acc_list = mtbc_get_random_sra.ncbi_random_acc_list
         self.df_mutation = None
         self._id = mtbc_get_random_sra._id
         self.sequence_dict = sequence_dict
+        self.final_acc_list = list()
         logging.info("len(self.sequence_dict)")
         logging.info(len(self.sequence_dict))
 
@@ -43,8 +47,11 @@ class MtbcAcclistToFASTA:
         ncbi_random_acc_list_len = len(self.ncbi_random_acc_list)
         index = 1
         logging.info("mtbc_request")
+        self.final_acc_list_length = 0
 
         for sra in self.ncbi_random_acc_list:
+            if self.final_acc_list_length >= self.target_list_length:
+                return
             logging.info(str(index) + "/" + str(ncbi_random_acc_list_len))
             index += 1
 
@@ -60,7 +67,10 @@ class MtbcAcclistToFASTA:
 
             if len(r.text) != 0:
                 logging.info(r.text[1:].split("\n")[0])
+                self.final_acc_list.append(r.text[1:].split("\n")[0])
                 self.sequence_dict[r.text[1:].split("\n")[0]] = {}
+                self.final_acc_list_length += 1
+                logging.info(self.final_acc_list)
                 for diff in r.text.split("\n")[2:]:
                     if len(diff) != 0:
                         ###############

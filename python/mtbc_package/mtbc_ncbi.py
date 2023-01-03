@@ -15,36 +15,7 @@ logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 
 
-class MtbcData:
-    def __init__(self):
 
-        # initial user variable
-
-        self.sample_list = None
-        self.all_id_to_acc = None
-        self.outgroup = None
-        self.list_length = None
-        Entrez.email = None
-        self.email = None
-        self.select_taxa = {self.taxa_mycobacterium_canettii: None,
-                            self.taxa_mycobacterium_mungi: None,
-                            self.taxa_mycobacterium_orygis: None,
-                            self.taxa_mycobacterium_tuberculosis: None}
-
-        # initialize empty variable
-        self.ml_tree = None
-        self.nj_tree = None
-        self.ncbi_random_acc_list = []
-        self.ncbi_random_id_list = None
-        self.ncbi_all_id = None
-        self.ncbi_request_all_id = None
-        self.align_with_alignIO = None
-        self.df_mutation = None
-        self.sequence_dict = {}
-        #self.alignement = {}
-        self.fasta = ""
-
-        self._id = ""
 
 
 
@@ -66,17 +37,24 @@ class MtbcGetRandomSRA:
                  select_mycobacterium_orygis=False,
                  select_mycobacterium_tuberculosis=False,
                  outgroup='',
-                 list_length=10,
+                 ncbi_list_length=100,
                  email='A.N.Other@example.com',
-                 all_id_to_acc=False):
+                 all_id_to_acc=False,
+                 target_list_length=10,
+                 snp_select=[],
+                 snp_reject=[]):
 
         # initial user variable
+        self.target_list_length = target_list_length
+        self.snp_select = snp_select
+        self.snp_reject = snp_reject
         self.sample_list = None
         self.all_id_to_acc = all_id_to_acc
         self.outgroup = outgroup
-        self.list_length = list_length
+        self.ncbi_list_length = ncbi_list_length
         Entrez.email = email
         self.email = email
+
         self.select_taxa = {self.taxa_mycobacterium_canettii: select_mycobacterium_canettii,
                             self.taxa_mycobacterium_mungi: select_mycobacterium_mungi,
                             self.taxa_mycobacterium_orygis: select_mycobacterium_orygis,
@@ -92,9 +70,11 @@ class MtbcGetRandomSRA:
         self.align_with_alignIO = None
         self.df_mutation = None
         self.sequence_dict = {'NC_000962.3': {}}
+        self.final_acc_list = None
+        self.final_acc_list_length = None
         self.fasta = None
 
-        self._id = str(uuid.uuid4()) + "_" + str(list_length)
+        self._id = str(uuid.uuid4()) + "_" + str(ncbi_list_length)
 
         # main program
         self.construct_search_request()
@@ -138,7 +118,7 @@ class MtbcGetRandomSRA:
     def select_random_ncbi_id_number(self):
         logging.info("select_random_ncbi_id_number")
         self.ncbi_random_id_list = random.choices(self.ncbi_all_id,
-                                                  k=self.list_length)
+                                                  k=self.ncbi_list_length)
 
     def acc_number_from_ncbi_id(self):
         if self.all_id_to_acc:
@@ -193,20 +173,6 @@ class MtbcGetRandomSRA:
     def add_outgroup(self):
         self.ncbi_random_acc_list.append(self.outgroup)
 
-
-
     def to_json(self):
         self.ncbi_all_id = None
         return self.__dict__
-
-    def to_db(self):
-        self.ncbi_all_id = None
-        try:
-            client = MongoClient('mongodb://localhost:27017/')
-            db_mtbc = client.db_mtbc
-            request_data = db_mtbc.request_data
-        except:
-            logging.error("error to connect mongo db")
-        get_id = request_data.insert_one(self.to_json()).inserted_id
-        logging.info(get_id)
-        client.close()
