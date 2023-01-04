@@ -8,8 +8,12 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from pymongo import MongoClient
 from starlette.responses import Response, RedirectResponse
+from uvicorn.loops import asyncio
+
+import python.mtbc_package.mtbc_tree
 from mtbc_package import mtbc_ncbi, mtbc_tools
 from settings import mongoSettings
+import time
 
 FORMAT = "%(levelname)s:%(message)s"
 logging.basicConfig(format=FORMAT, level=logging.INFO)
@@ -61,12 +65,15 @@ async def get_sra_list_form(request: Request):
 
 @test.get("/download_sra/{id}")
 async def download_sra(id: str = ''):
-    client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
-    db_mtbc = client.db_mtbc
-    request_data = db_mtbc.request_data
-
-    resultat = request_data.find_one({"_id": id})
-    client.close()
+    try:
+        client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+        db_mtbc = client.db_mtbc
+        request_data = db_mtbc.request_data
+        resultat = request_data.find_one({"_id": id})
+    except:
+        logging.error("error to connect mongo db")
+    finally:
+        client.close()
 
     return resultat
 
@@ -128,13 +135,15 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                     select_mycobacterium_orygis: bool = False,
                     select_mycobacterium_tuberculosis: bool = False,
                     outgroup: str = '',
-                    ncbi_list_length: int = 100,
+                    #ncbi_list_length: int = 100,
 
                     email: str = 'A.N.Other@example.com',
                     snp_select: list = [],
                     snp_reject: list = [],
                     target_list_length=100
                     ):
+
+    start_time = time.time()
     mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(select_mycobacterium_canettii=select_mycobacterium_canettii,
                                            select_mycobacterium_mungi=select_mycobacterium_mungi,
                                            select_mycobacterium_orygis=select_mycobacterium_orygis,
@@ -148,12 +157,19 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                                            target_list_length=target_list_length
                                            )
     logging.info("LOGGING")
-    client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
-    db_mtbc = client.db_mtbc
-    request_data = db_mtbc.request_data
-    get_id = request_data.insert_one(mtbc_inst.to_json()).inserted_id
-    logging.info(get_id)
-    client.close()
+    mtbc_sra_list_time = time.time() - start_time
+    logging.info("mtbc_sra_list_time : " + str(mtbc_sra_list_time))
+    try:
+        client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+        db_mtbc = client.db_mtbc
+        request_data = db_mtbc.request_data
+        get_id = request_data.insert_one(mtbc_inst.to_json()).inserted_id
+        logging.info("get_id : " + str(get_id))
+        request_data.update_one({"_id": get_id},{"$set": {"mtbc_sra_list_time": mtbc_sra_list_time}})
+    except:
+        logging.error("error to connect mongo db")
+    finally:
+        client.close()
     return mtbc_inst.to_json()
 
 
@@ -169,6 +185,8 @@ async def fasta_align_from_json(id: str = ""):
     finally:
         client.close()
 
+    start_time = time.time()
+
     resultat_json = json.dumps(resultat)
     resultat_obj = json.loads(resultat_json, object_hook=lambda d: SimpleNamespace(**d))
     logging.info(resultat_obj._id)
@@ -177,10 +195,18 @@ async def fasta_align_from_json(id: str = ""):
                                                target_list_length=resultat["target_list_length"],
                                                final_acc_list=resultat["final_acc_list"])
     logging.info("Preparation envoi à MongoDB")
+
+    mtbc_fasta_align_from_json_time = time.time() - start_time
+    logging.info("mtbc_fasta_align_from_json : " + str(mtbc_fasta_align_from_json_time))
+
+
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
+        request_data.update_one(
+            {"_id": id},
+            {"$set": {"mtbc_fasta_align_from_json_time": mtbc_fasta_align_from_json_time}})
         request_data.update_one(
             {"_id": id},
             {"$set": {"final_acc_list_length": mtbc_fasta.final_acc_list_length}})
@@ -208,7 +234,6 @@ async def fasta_align_from_json(id: str = ""):
 
     response = Response(mtbc_fasta.fasta, media_type='text/plain')
     response.headers["Content-Disposition"] = 'attachment; filename={0}.fasta'.format(id)
-
 
     return response
 
@@ -241,7 +266,8 @@ async def nj_tree_from_db(id: str = ""):
             fasta = request_data.find_one({"_id": id})["fasta"]
             client.close()
 
-        nj_tree = mtbc_tools.MtbcTree.create_nj_tree_static(id, fasta)
+
+        nj_tree = python.mtbc_package.mtbc_tree.MtbcTree.create_nj_tree_static(id, fasta)
         try:
             client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
@@ -281,7 +307,7 @@ async def ml_tree_from_db(id: str = ""):
             fasta = request_data.find_one({"_id": id})["fasta"]
             client.close()
 
-        ml_tree = mtbc_tools.MtbcTree.create_ml_tree_static(id, fasta)
+        ml_tree = python.mtbc_package.mtbc_tree.MtbcTree.create_ml_tree_static(id, fasta)
         try:
             client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc

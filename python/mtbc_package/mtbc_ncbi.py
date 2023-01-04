@@ -51,7 +51,7 @@ class MtbcGetRandomSRA:
         self.sample_list = None
         self.all_id_to_acc = all_id_to_acc
         self.outgroup = outgroup
-        self.ncbi_list_length = ncbi_list_length
+        self.ncbi_list_length = int(3 * int(target_list_length))
         Entrez.email = email
         self.email = email
 

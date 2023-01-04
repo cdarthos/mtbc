@@ -1,18 +1,10 @@
 import io
-import json
-import os
-import pprint
 
 import pandas
 import requests
-from Bio import Entrez, AlignIO, Phylo
-from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from pandas import CategoricalDtype
 import logging
-from pymongo import MongoClient
 from .mtbc_ncbi import MtbcGetRandomSRA
-import dendropy
-from dendropy.interop import raxml
 
 FORMAT = "%(levelname)s:%(message)s"
 logging.basicConfig(format=FORMAT, level=logging.INFO)
@@ -27,7 +19,7 @@ class MtbcAcclistToFASTA:
 
         # initial user variable
         self.final_acc_list_length = None
-        self.target_list_length = target_list_length
+        self.target_list_length: int = int(target_list_length)
         self.fasta = None
         self.ncbi_random_acc_list = mtbc_get_random_sra.ncbi_random_acc_list
         self.df_mutation = None
@@ -80,7 +72,7 @@ class MtbcAcclistToFASTA:
                 self.final_acc_list.append(r.text[1:].split("\n")[0])
                 self.sequence_dict[r.text[1:].split("\n")[0]] = {}
                 self.final_acc_list_length += 1
-                logging.info(self.final_acc_list)
+                logging.debug(self.final_acc_list)
                 for diff in r.text.split("\n")[2:]:
                     if len(diff) != 0:
                         ###############
@@ -108,36 +100,3 @@ class MtbcAcclistToFASTA:
         return self.__dict__
 
 
-class MtbcTree:
-
-    def create_nj_tree_static(id, fasta):
-        logging.info("create_nj_tree_static")
-        calculator = DistanceCalculator('identity')
-        handle_fasta = io.StringIO(fasta)
-        align = AlignIO.read(handle_fasta, 'fasta')
-        dist_matrix = calculator.get_distance(align)
-        logging.info("dist_matrix")
-        logging.debug(dist_matrix)
-        constructor = DistanceTreeConstructor()
-        nj_tree = constructor.nj(dist_matrix)
-        handle = io.StringIO()
-        Phylo.write(nj_tree, handle, "newick", )
-        resultat = handle.getvalue()
-        handle.close()
-        return resultat
-
-    def create_ml_tree_static(id, fasta):
-        logging.info("create_ml_tree_static")
-        data = dendropy.DnaCharacterMatrix.get(
-            data=fasta, schema="fasta")
-        logging.info("data")
-        rx = raxml.RaxmlRunner()
-        ml_tree = rx.estimate_tree(
-            char_matrix=data,
-            raxml_args=["--no-bfgs"])
-        ml_tree_str = ml_tree.as_string(schema="newick")
-        logging.info(ml_tree_str)
-        return ml_tree_str
-
-    def to_json(self):
-        return self.__dict__
