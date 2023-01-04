@@ -129,17 +129,19 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                     select_mycobacterium_tuberculosis: bool = False,
                     outgroup: str = '',
                     ncbi_list_length: int = 100,
+
                     email: str = 'A.N.Other@example.com',
                     snp_select: list = [],
                     snp_reject: list = [],
-                    target_list_length=10
+                    target_list_length=100
                     ):
     mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(select_mycobacterium_canettii=select_mycobacterium_canettii,
                                            select_mycobacterium_mungi=select_mycobacterium_mungi,
                                            select_mycobacterium_orygis=select_mycobacterium_orygis,
                                            select_mycobacterium_tuberculosis=select_mycobacterium_tuberculosis,
                                            outgroup=outgroup,
-                                           ncbi_list_length=ncbi_list_length,
+                                           #ncbi_list_length=ncbi_list_length,
+                                           ncbi_list_length= 3 * target_list_length,
                                            email=email,
                                            snp_select=snp_select,
                                            snp_reject=snp_reject,

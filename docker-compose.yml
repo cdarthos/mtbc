@@ -10,7 +10,7 @@ services:
     volumes:
       - .:/code/
     ports:
-      - "80:80"
+      - "8080:80"
     environment:
       - MONGO_HOST=mongodb
 
