@@ -70,7 +70,7 @@ class MtbcGetRandomSRA:
         self.align_with_alignIO = None
         self.df_mutation = None
         self.sequence_dict = {'NC_000962.3': {}}
-        self.final_acc_list = None
+        self.final_acc_list = list()
         self.final_acc_list_length = None
         self.fasta = None
 

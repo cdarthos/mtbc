@@ -22,7 +22,8 @@ class MtbcAcclistToFASTA:
     def __init__(self,
                  mtbc_get_random_sra: MtbcGetRandomSRA,
                  sequence_dict,
-                 target_list_length):
+                 target_list_length,
+                 final_acc_list):
 
         # initial user variable
         self.final_acc_list_length = None
@@ -32,7 +33,7 @@ class MtbcAcclistToFASTA:
         self.df_mutation = None
         self._id = mtbc_get_random_sra._id
         self.sequence_dict = sequence_dict
-        self.final_acc_list = list()
+        self.final_acc_list: list = final_acc_list
         logging.info("len(self.sequence_dict)")
         logging.info(len(self.sequence_dict))
 
@@ -44,15 +45,24 @@ class MtbcAcclistToFASTA:
 
 
     def mtbc_request(self):
-        ncbi_random_acc_list_len = len(self.ncbi_random_acc_list)
+        logging.info("mtbc_request")
+        if self.final_acc_list:
+            logging.info("if self.final_acc_list:")
+            sra_list = self.final_acc_list
+        else:
+            logging.info("if self.final_acc_list: else :")
+            sra_list = self.ncbi_random_acc_list
         index = 1
         logging.info("mtbc_request")
         self.final_acc_list_length = 0
 
-        for sra in self.ncbi_random_acc_list:
+        for sra in sra_list:
             if self.final_acc_list_length >= self.target_list_length:
                 return
-            logging.info(str(index) + "/" + str(ncbi_random_acc_list_len))
+            logging.info("ncbi")
+            logging.info(str(index) + "/" + str(len(self.ncbi_random_acc_list)))
+            logging.info("final")
+            logging.info(str(self.final_acc_list_length) + "/" + str(self.target_list_length))
             index += 1
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
