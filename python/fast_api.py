@@ -42,13 +42,14 @@ async def root(request: Request):
     #logging.info("\n")
 
     test2 = list(tests)
-    logging.info(test2)
+    logging.debug(test2)
 
     client.close()
     return templates.TemplateResponse("index.j2",
                                       {"request": request, "fasta": db_fasta, "nj_tree": db_nj_tree,
                                        "sra_list": db_sra_list,
-                                       "ml_tree": db_ml_tree})
+                                       "ml_tree": db_ml_tree,
+                                       "test": test2 })
 
 
 @test.get("/get_sra_list_form")
@@ -79,7 +80,7 @@ async def download_fasta(id: str = ''):
     except:
         logging.error("error to connect mongo db")
 
-    resultat = request_data.find_one({"_id": id})["fasta"]
+    resultat = request_data.find_one({"_id": id}, {"_id": 0, "fasta" : 1})["fasta"]
     client.close()
 
     response = Response(resultat, media_type='text/plain')
@@ -203,7 +204,11 @@ async def fasta_align_from_json(id: str = ""):
         client.close()
         logging.info("Mongodb connection close")
 
-    return mtbc_fasta.fasta
+    response = Response(mtbc_fasta.fasta, media_type='text/plain')
+    response.headers["Content-Disposition"] = 'attachment; filename={0}.fasta'.format(id)
+
+
+    return response
 
 
 @test.get("/mtbc_nj_tree_from_db/{id}")
