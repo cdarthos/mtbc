@@ -255,7 +255,7 @@ async def nj_tree_from_db(id: str = ""):
             fasta_ = fasta_align_from_json(id)
             logging.info(fasta_)
             fasta = fasta_.body
-            logging.info(fasta)
+            logging.debug(fasta)
             #await fasta_coroutine
             #try:
             #    client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
