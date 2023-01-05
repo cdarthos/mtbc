@@ -20,6 +20,7 @@ logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 
 class MtbcGetRandomSRA:
+    target_list_length: int
     # Mycobacterium tuberculosis complex 77643
     taxa_mycobacterium_tuberculosis_complex = '77643'
     # Mycobacterium canettii 78331
@@ -51,7 +52,7 @@ class MtbcGetRandomSRA:
         self.sample_list = None
         self.all_id_to_acc = all_id_to_acc
         self.outgroup = outgroup
-        self.ncbi_list_length = int(3 * int(target_list_length))
+        self.ncbi_list_length = 3 * int(target_list_length)
         Entrez.email = email
         self.email = email
 
@@ -74,7 +75,7 @@ class MtbcGetRandomSRA:
         self.final_acc_list_length = None
         self.fasta = None
 
-        self._id = str(uuid.uuid4()) + "_" + str(ncbi_list_length)
+        self._id = str(uuid.uuid4()) + "_" + str(self.target_list_length)
 
         # main program
         self.construct_search_request()

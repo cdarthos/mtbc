@@ -172,7 +172,7 @@ async def set_param(select_mycobacterium_canettii: bool = False,
 
 
 @test.get("/mtbc_fasta_align_from_json")
-async def fasta_align_from_json(id: str = ""):
+def fasta_align_from_json(id: str = ""):
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -252,16 +252,16 @@ async def nj_tree_from_db(id: str = ""):
     else:
         if fasta is None:
 
-            fasta_coroutine = fasta_align_from_json(id)
-            await fasta_coroutine
-            try:
-                client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
-                db_mtbc = client.db_mtbc
-                request_data = db_mtbc.request_data
-            except:
-                logging.error("error to connect mongo db")
-            fasta = request_data.find_one({"_id": id})["fasta"]
-            client.close()
+            fasta = fasta_align_from_json(id)
+            #await fasta_coroutine
+            #try:
+            #    client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+            #    db_mtbc = client.db_mtbc
+            #    request_data = db_mtbc.request_data
+            #except:
+            #    logging.error("error to connect mongo db")
+            #fasta = request_data.find_one({"_id": id})["fasta"]
+            #client.close()
 
         start_time = time.time()
         nj_tree = mtbc_tree.MtbcTree.create_nj_tree_static(id, fasta)
