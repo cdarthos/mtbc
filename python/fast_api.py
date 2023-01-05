@@ -10,8 +10,8 @@ from pymongo import MongoClient
 from starlette.responses import Response, RedirectResponse
 from uvicorn.loops import asyncio
 
-import python.mtbc_package.mtbc_tree
-from mtbc_package import mtbc_ncbi, mtbc_tools
+#import mtbc_package.mtbc_tree
+from mtbc_package import mtbc_ncbi, mtbc_tools, mtbc_tree
 from settings import mongoSettings
 import time
 
