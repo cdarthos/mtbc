@@ -139,7 +139,7 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                     email: str = 'A.N.Other@example.com',
                     snp_select: list = [],
                     snp_reject: list = [],
-                    target_list_length=100
+                    target_list_length: int = 100
                     ):
     start_time = time.time()
     mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(select_mycobacterium_canettii=select_mycobacterium_canettii,
