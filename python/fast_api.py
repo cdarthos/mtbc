@@ -10,7 +10,7 @@ from pymongo import MongoClient
 from starlette.responses import Response, RedirectResponse
 from uvicorn.loops import asyncio
 
-#import mtbc_package.mtbc_tree
+import python.mtbc_package.mtbc_tree
 from mtbc_package import mtbc_ncbi, mtbc_tools, mtbc_tree
 from settings import mongoSettings
 import time
@@ -267,7 +267,7 @@ async def nj_tree_from_db(id: str = ""):
             client.close()
 
 
-        nj_tree = python.mtbc_package.mtbc_tree.MtbcTree.create_nj_tree_static(id, fasta)
+        nj_tree = mtbc_tree.MtbcTree.create_nj_tree_static(id, fasta)
         try:
             client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
@@ -307,7 +307,7 @@ async def ml_tree_from_db(id: str = ""):
             fasta = request_data.find_one({"_id": id})["fasta"]
             client.close()
 
-        ml_tree = python.mtbc_package.mtbc_tree.MtbcTree.create_ml_tree_static(id, fasta)
+        ml_tree =mtbc_tree.MtbcTree.create_ml_tree_static(id, fasta)
         try:
             client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
