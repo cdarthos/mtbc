@@ -10,7 +10,6 @@ from pymongo import MongoClient
 from starlette.responses import Response, RedirectResponse
 from uvicorn.loops import asyncio
 
-
 from mtbc_package import mtbc_ncbi, mtbc_tools, mtbc_tree
 from settings import mongoSettings
 import time
@@ -41,9 +40,9 @@ async def root(request: Request):
     db_fasta = request_data.find({"fasta": {"$ne": None}}).distinct("_id")
 
     tests = request_data.find({}, {"_id": 1, "fasta": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1})
-    #for test in tests:
+    # for test in tests:
     #    logging.info(test)
-    #logging.info("\n")
+    # logging.info("\n")
 
     test2 = list(tests)
     logging.debug(test2)
@@ -53,7 +52,7 @@ async def root(request: Request):
                                       {"request": request, "fasta": db_fasta, "nj_tree": db_nj_tree,
                                        "sra_list": db_sra_list,
                                        "ml_tree": db_ml_tree,
-                                       "test": test2 })
+                                       "test": test2})
 
 
 @test.get("/get_sra_list_form")
@@ -87,7 +86,7 @@ async def download_fasta(id: str = ''):
     except:
         logging.error("error to connect mongo db")
 
-    resultat = request_data.find_one({"_id": id}, {"_id": 0, "fasta" : 1})["fasta"]
+    resultat = request_data.find_one({"_id": id}, {"_id": 0, "fasta": 1})["fasta"]
     client.close()
 
     response = Response(resultat, media_type='text/plain')
@@ -135,22 +134,21 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                     select_mycobacterium_orygis: bool = False,
                     select_mycobacterium_tuberculosis: bool = False,
                     outgroup: str = '',
-                    #ncbi_list_length: int = 100,
+                    # ncbi_list_length: int = 100,
 
                     email: str = 'A.N.Other@example.com',
                     snp_select: list = [],
                     snp_reject: list = [],
                     target_list_length=100
                     ):
-
     start_time = time.time()
     mtbc_inst = mtbc_ncbi.MtbcGetRandomSRA(select_mycobacterium_canettii=select_mycobacterium_canettii,
                                            select_mycobacterium_mungi=select_mycobacterium_mungi,
                                            select_mycobacterium_orygis=select_mycobacterium_orygis,
                                            select_mycobacterium_tuberculosis=select_mycobacterium_tuberculosis,
                                            outgroup=outgroup,
-                                           #ncbi_list_length=ncbi_list_length,
-                                           ncbi_list_length= 3 * target_list_length,
+                                           # ncbi_list_length=ncbi_list_length,
+                                           ncbi_list_length=3 * target_list_length,
                                            email=email,
                                            snp_select=snp_select,
                                            snp_reject=snp_reject,
@@ -165,7 +163,7 @@ async def set_param(select_mycobacterium_canettii: bool = False,
         request_data = db_mtbc.request_data
         get_id = request_data.insert_one(mtbc_inst.to_json()).inserted_id
         logging.info("get_id : " + str(get_id))
-        request_data.update_one({"_id": get_id},{"$set": {"mtbc_sra_list_time": mtbc_sra_list_time}})
+        request_data.update_one({"_id": get_id}, {"$set": {"mtbc_sra_list_time": mtbc_sra_list_time}})
     except:
         logging.error("error to connect mongo db")
     finally:
@@ -198,7 +196,6 @@ async def fasta_align_from_json(id: str = ""):
 
     mtbc_fasta_align_from_json_time = time.time() - start_time
     logging.info("mtbc_fasta_align_from_json : " + str(mtbc_fasta_align_from_json_time))
-
 
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
@@ -266,8 +263,10 @@ async def nj_tree_from_db(id: str = ""):
             fasta = request_data.find_one({"_id": id})["fasta"]
             client.close()
 
-
+        start_time = time.time()
         nj_tree = mtbc_tree.MtbcTree.create_nj_tree_static(id, fasta)
+        nj_tree_time = time.time() - start_time
+
         try:
             client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
@@ -277,6 +276,9 @@ async def nj_tree_from_db(id: str = ""):
         request_data.update_one(
             {"_id": id},
             {"$set": {"nj_tree": nj_tree}})
+        request_data.update_one(
+            {"_id": id},
+            {"$set": {"nj_tree_time": nj_tree_time}})
         client.close()
         return RedirectResponse("/download_nj_tree/{0}".format(id))
 
@@ -307,17 +309,24 @@ async def ml_tree_from_db(id: str = ""):
             fasta = request_data.find_one({"_id": id})["fasta"]
             client.close()
 
-        ml_tree =mtbc_tree.MtbcTree.create_ml_tree_static(id, fasta)
+        start_time = time.time()
+        ml_tree = mtbc_tree.MtbcTree.create_ml_tree_static(id, fasta)
+        ml_tree_time = time.time() - start_time
+
         try:
             client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
             request_data = db_mtbc.request_data
+            request_data.update_one(
+                {"_id": id},
+                {"$set": {"ml_tree": ml_tree}})
+            request_data.update_one(
+                {"_id": id},
+                {"$set": {"ml_tree_time": ml_tree_time}})
         except:
             logging.error("error to connect mongo db")
-        request_data.update_one(
-            {"_id": id},
-            {"$set": {"ml_tree": ml_tree}})
-        client.close()
+        finally:
+            client.close()
         return RedirectResponse("/download_ml_tree/{0}".format(id))
 
 
