@@ -129,8 +129,10 @@ class MtbcGetRandomSRA:
         all_id_len = len(self.ncbi_all_id)
         logging.info("Number of ncbi ID : " + str(all_id_len))
         batchs = generate_batch(self.ncbi_all_id, 10000)
-
+        index = 1
         for batch in  batchs:
+            logging.info("batch : " + str(index))
+            index += 1
             handle_esummary = Entrez.esummary(db="sra",
                                           id=",".join(map(str, batch))
                                           )
