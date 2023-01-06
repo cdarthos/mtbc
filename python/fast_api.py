@@ -64,6 +64,10 @@ async def get_sra_list_form(request: Request):
 
 @test.get("/download_sra/{id}")
 async def download_sra(id: str = ''):
+    if id is None:
+        return request_data.find().distinct("_id")
+  
+    
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -79,6 +83,9 @@ async def download_sra(id: str = ''):
 
 @test.get("/download_fasta/{id}")
 async def download_fasta(id: str = ''):
+    if id is None:
+        return request_data.find({"fasta": {"$ne": None}}).distinct("_id")
+    
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -96,6 +103,9 @@ async def download_fasta(id: str = ''):
 
 @test.get("/download_nj_tree/{id}")
 async def download_nj_tree(id: str = ''):
+    if id is None:
+        return request_data.find({"nj_tree": {"$ne": None}}).distinct("_id")
+   
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -113,6 +123,8 @@ async def download_nj_tree(id: str = ''):
 
 @test.get("/download_ml_tree/{id}")
 async def download_ml_tree(id: str = ""):
+    if id is None:
+        return request_data.find({"ml_tree": {"$ne": None}}).distinct("_id")
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -301,16 +313,19 @@ async def ml_tree_from_db(id: str = ""):
         return resultat
     else:
         if fasta is None:
-            fasta_coroutine = fasta_align_from_json(id)
-            await fasta_coroutine
-            try:
-                client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
-                db_mtbc = client.db_mtbc
-                request_data = db_mtbc.request_data
-            except:
-                logging.error("error to connect mongo db")
-            fasta = request_data.find_one({"_id": id})["fasta"]
-            client.close()
+            fasta_ = fasta_align_from_json(id)
+            logging.info(fasta_)
+            fasta = fasta_.body.decode("utf-8")
+            logging.debug(fasta)
+            #await fasta_coroutine
+            #try:
+            #    client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+            #    db_mtbc = client.db_mtbc
+            #    request_data = db_mtbc.request_data
+            #except:
+            #    logging.error("error to connect mongo db")
+            #fasta = request_data.find_one({"_id": id})["fasta"]
+            #client.close()
 
         start_time = time.time()
         ml_tree = mtbc_tree.MtbcTree.create_ml_tree_static(id, fasta)
