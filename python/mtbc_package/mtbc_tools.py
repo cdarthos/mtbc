@@ -9,15 +9,20 @@ from .mtbc_ncbi import MtbcGetRandomSRA
 FORMAT = "%(levelname)s:%(message)s"
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
+
 class MtbcAcclistToFASTA:
 
     def __init__(self,
                  mtbc_get_random_sra: MtbcGetRandomSRA,
                  sequence_dict,
                  target_list_length,
-                 final_acc_list):
+                 final_acc_list,
+                 snp_select=[],
+                 snp_reject=[]):
 
         # initial user variable
+        self.snp_select = snp_select
+        self.snp_reject = snp_reject
         self.final_acc_list_length = None
         self.target_list_length: int = int(target_list_length)
         self.fasta = None
@@ -35,7 +40,6 @@ class MtbcAcclistToFASTA:
         logging.debug(self.sequence_dict)
         self.reconstruct_sequence_to_fasta_file()
 
-
     def mtbc_request(self):
         logging.info("mtbc_request")
         if self.final_acc_list:
@@ -48,6 +52,12 @@ class MtbcAcclistToFASTA:
         logging.info("mtbc_request")
         self.final_acc_list_length = 0
 
+
+        ## check if snp reject
+        check_snp = False
+        if len(self.snp_reject) > 0:
+            check_snp = True
+
         for sra in sra_list:
             if self.final_acc_list_length >= self.target_list_length:
                 return
@@ -55,7 +65,7 @@ class MtbcAcclistToFASTA:
             logging.info(str(index) + "/" + str(len(self.ncbi_random_acc_list)))
             logging.info("final")
             logging.info(str(self.final_acc_list_length) + "/" + str(self.target_list_length))
-            index += 1
+
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
                     'Host': 'gnksoftware.synology.me:30002'}
@@ -67,6 +77,14 @@ class MtbcAcclistToFASTA:
             url = 'http://gnksoftware.synology.me:30002/strains/alignment'
             r = requests.post(url, parameters, head)
 
+            ## reject
+            logging.info(("list of reject snp : " + str(self.snp_reject)))
+            if check_snp and any(snp in r.text for snp in self.snp_reject):
+                logging.info("SRA : " + str(sra)  + " is reject because contains snp_reject ")
+                pass
+
+
+            index += 1
             if len(r.text) != 0:
                 logging.info(r.text[1:].split("\n")[0])
                 self.final_acc_list.append(r.text[1:].split("\n")[0])
@@ -98,5 +116,3 @@ class MtbcAcclistToFASTA:
 
     def to_json(self):
         return self.__dict__
-
-
