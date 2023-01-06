@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 import os
@@ -165,7 +167,7 @@ async def set_param(select_mycobacterium_canettii: bool = False,
 
                     email: str = 'A.N.Other@example.com',
                     snp_select: Union[List[str], None] = Query(default=None),
-                    snp_reject:  list = Query(default=[]),
+                    snp_reject:  list[str] | None = Query(default=None),
                     target_list_length: int = 100
                     ):
     start_time = time.time()
