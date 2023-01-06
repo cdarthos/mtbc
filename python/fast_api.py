@@ -163,7 +163,7 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                     select_mycobacterium_orygis: bool = False,
                     select_mycobacterium_tuberculosis: bool = False,
                     outgroup: str = '',
-                    # ncbi_list_length: int = 100,
+                    all_id_to_acc: bool = False,
 
                     email: str = 'A.N.Other@example.com',
                     snp_select: Union[List[str], None] = Query(default=None),
@@ -182,7 +182,8 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                                            email=email,
                                            snp_select=snp_select,
                                            snp_reject=snp_reject,
-                                           target_list_length=target_list_length
+                                           target_list_length=target_list_length,
+                                           all_id_to_acc=all_id_to_acc
                                            )
     logging.info("LOGGING")
     mtbc_sra_list_time = time.time() - start_time
@@ -193,6 +194,7 @@ async def set_param(select_mycobacterium_canettii: bool = False,
         request_data = db_mtbc.request_data
         get_id = request_data.insert_one(mtbc_inst.to_json()).inserted_id
         logging.info("get_id : " + str(get_id))
+        request_data.update_one({"_id": get_id}, {"$set": {"raxml_parameter": raxml_parameter}})
         request_data.update_one({"_id": get_id}, {"$set": {"mtbc_sra_list_time": mtbc_sra_list_time}})
     except:
         logging.error("error to connect mongo db")

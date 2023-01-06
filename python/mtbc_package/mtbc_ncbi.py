@@ -14,11 +14,6 @@ FORMAT = "%(levelname)s:%(message)s"
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 
-
-
-
-
-
 class MtbcGetRandomSRA:
     target_list_length: int
     # Mycobacterium tuberculosis complex 77643
@@ -46,6 +41,7 @@ class MtbcGetRandomSRA:
                  snp_reject=[]):
 
         # initial user variable
+        self.ncbi_all_acc_list = None
         self.target_list_length = target_list_length
         self.snp_select = snp_select
         self.snp_reject = snp_reject
@@ -89,9 +85,6 @@ class MtbcGetRandomSRA:
         self.acc_number_from_ncbi_id()
         logging.info("self.acc_list")
 
-
-
-
     def construct_search_request(self):
         logging.info("construct_search_request")
         if True in self.select_taxa.values():
@@ -128,28 +121,35 @@ class MtbcGetRandomSRA:
             self.limit_acc_number_from_ncbi_id()
 
     def no_limit_acc_number_from_ncbi_id(self):
-        handle_epost = Entrez.epost(db="sra", id=",".join(map(str, self.ncbi_all_id)))
-        record_epost = Entrez.read(handle_epost)
-        handle_epost.close()
-        #logging.debug(record_epost)
-        logging.debug(record_epost['WebEnv'])
+        def generate_batch(lst, batch_size):
+            for i in range(0, len(lst), batch_size):
+                yield lst[i: i + batch_size]
+        logging.info("no_limit_acc_number_from_ncbi_id")
+        #self.ncbi_all_id
+        all_id_len = len(self.ncbi_all_id)
+        logging.info("Number of ncbi ID : " + str(all_id_len))
+        batchs = generate_batch(self.ncbi_all_id, 10000)
 
-        for start in range(0, len(self.ncbi_all_id), 5000):
+        for batch in  batchs:
             handle_esummary = Entrez.esummary(db="sra",
-                                              query_key=record_epost['QueryKey'],
-                                              WebEnv=record_epost['WebEnv'],
-                                              retsart=start,
-                                              retmax=5000
-                                              )
+                                          id=",".join(map(str, batch))
+                                          )
             record_esummary = Entrez.read(handle_esummary)
+            logging.info("record_esummary")
+            logging.debug(record_esummary)
             handle_esummary.close()
+
             runs = list(map(itemgetter('Runs'),
                             record_esummary))
+
             runs_1 = list(map(lambda run: "<root>" + run + "</root>",
                               runs))
+
             runs_acc = list(map(xmltodict.parse, runs_1))
+
             acc_list = pd.json_normalize(runs_acc)['root.Run.@acc']
-            self.ncbi_random_acc_list = self.ncbi_random_acc_list + acc_list.to_list()
+
+            self.ncbi_random_acc_list = shuffle(acc_list.dropna().to_list())
 
     def limit_acc_number_from_ncbi_id(self):
         handle_esummary = Entrez.esummary(db="sra",
