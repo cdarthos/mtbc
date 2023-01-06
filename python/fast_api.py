@@ -64,6 +64,10 @@ async def get_sra_list_form(request: Request):
 
 @test.get("/download_sra/{id}")
 async def download_sra(id: str = ''):
+    if id is None:
+        return request_data.find().distinct("_id")
+  
+    
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -79,6 +83,9 @@ async def download_sra(id: str = ''):
 
 @test.get("/download_fasta/{id}")
 async def download_fasta(id: str = ''):
+    if id is None:
+        return request_data.find({"fasta": {"$ne": None}}).distinct("_id")
+    
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -96,6 +103,9 @@ async def download_fasta(id: str = ''):
 
 @test.get("/download_nj_tree/{id}")
 async def download_nj_tree(id: str = ''):
+    if id is None:
+        return request_data.find({"nj_tree": {"$ne": None}}).distinct("_id")
+   
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -113,6 +123,8 @@ async def download_nj_tree(id: str = ''):
 
 @test.get("/download_ml_tree/{id}")
 async def download_ml_tree(id: str = ""):
+    if id is None:
+        return request_data.find({"ml_tree": {"$ne": None}}).distinct("_id")
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
