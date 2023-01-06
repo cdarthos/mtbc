@@ -2,9 +2,10 @@ import json
 import logging
 import os
 from types import SimpleNamespace
+from typing import Union, List
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Query
 from fastapi.templating import Jinja2Templates
 from pymongo import MongoClient
 from starlette.responses import Response, RedirectResponse
@@ -149,8 +150,8 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                     # ncbi_list_length: int = 100,
 
                     email: str = 'A.N.Other@example.com',
-                    snp_select: Union[list[str], None] = Query(default=None),
-                    snp_reject: Union[list[str], None] = Query(default=None),
+                    snp_select: Union[List[str], None] = Query(default=None),
+                    snp_reject: Union[List[str], None] = Query(default=None),
                     target_list_length: int = 100
                     ):
     start_time = time.time()
