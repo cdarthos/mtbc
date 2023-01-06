@@ -151,7 +151,8 @@ class MtbcGetRandomSRA:
 
             acc_list = pd.json_normalize(runs_acc)['root.Run.@acc']
 
-            self.ncbi_random_acc_list = shuffle(acc_list.dropna().to_list())
+            self.ncbi_random_acc_list.append(acc_list.dropna().to_list())
+        self.ncbi_random_acc_list = shuffle(self.ncbi_random_acc_list)
 
     def limit_acc_number_from_ncbi_id(self):
         handle_esummary = Entrez.esummary(db="sra",
