@@ -301,16 +301,19 @@ async def ml_tree_from_db(id: str = ""):
         return resultat
     else:
         if fasta is None:
-            fasta_coroutine = fasta_align_from_json(id)
-            await fasta_coroutine
-            try:
-                client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
-                db_mtbc = client.db_mtbc
-                request_data = db_mtbc.request_data
-            except:
-                logging.error("error to connect mongo db")
-            fasta = request_data.find_one({"_id": id})["fasta"]
-            client.close()
+            fasta_ = fasta_align_from_json(id)
+            logging.info(fasta_)
+            fasta = fasta_.body.decode("utf-8")
+            logging.debug(fasta)
+            #await fasta_coroutine
+            #try:
+            #    client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+            #    db_mtbc = client.db_mtbc
+            #    request_data = db_mtbc.request_data
+            #except:
+            #    logging.error("error to connect mongo db")
+            #fasta = request_data.find_one({"_id": id})["fasta"]
+            #client.close()
 
         start_time = time.time()
         ml_tree = mtbc_tree.MtbcTree.create_ml_tree_static(id, fasta)
