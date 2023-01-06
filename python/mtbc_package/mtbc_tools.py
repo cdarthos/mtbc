@@ -49,6 +49,7 @@ class MtbcAcclistToFASTA:
             logging.info("if self.final_acc_list: else :")
             sra_list = self.ncbi_random_acc_list
         index = 1
+        reject = 0
         logging.info("mtbc_request")
         self.final_acc_list_length = 0
 
@@ -81,6 +82,7 @@ class MtbcAcclistToFASTA:
             logging.info(("list of reject snp : " + str(self.snp_reject)))
             if check_snp and any(snp in r.text for snp in self.snp_reject):
                 logging.info("SRA : " + str(sra)  + " is reject because contains snp_reject ")
+                reject += 1
                 pass
 
 
@@ -99,6 +101,20 @@ class MtbcAcclistToFASTA:
                         if len(diff.split(":")[3]) == 1:
                             self.sequence_dict['NC_000962.3'][diff.split(":")[1]] = diff.split(":")[2]
                             self.sequence_dict[r.text[1:].split("\n")[0]][diff.split(":")[1]] = diff.split(":")[3]
+
+        logging.info("#########################################")
+        logging.info("#########################################")
+        logging.info("#########################################")
+        logging.info("#########################################")
+        logging.info("#########################################")
+        logging.info("Nombre de SNP_reject : " + str(reject))
+        logging.info("#########################################")
+        logging.info("#########################################")
+        logging.info("#########################################")
+        logging.info("#########################################")
+        logging.info("#########################################")
+
+
 
     def reconstruct_sequence_to_fasta_file(self):
 
