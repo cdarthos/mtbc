@@ -223,7 +223,8 @@ def fasta_align_from_json(id: str = ""):
     sequence_dict = resultat["sequence_dict"]
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(resultat_obj, sequence_dict,
                                                target_list_length=resultat["target_list_length"],
-                                               final_acc_list=resultat["final_acc_list"])
+                                               final_acc_list=resultat["final_acc_list"],
+                                               snp_reject=resultat["snp_reject"])
     logging.info("Preparation envoi à MongoDB")
 
     mtbc_fasta_align_from_json_time = time.time() - start_time
