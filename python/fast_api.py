@@ -74,10 +74,10 @@ async def root(request: Request):
 
 
 @test.get("/download_sra/{id}", tags=["download_sra"])
-async def download_sra(id: str = ''):
+async def download_sra(id: str = None):
     result = None
     client = None
-    if id is '':
+    if id is None:
         try:
             client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
