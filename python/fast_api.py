@@ -1,17 +1,13 @@
 from __future__ import annotations
-
 import json
 import logging
-
 from types import SimpleNamespace
 from typing import Union, List
-
 import uvicorn
 from fastapi import FastAPI, Request, Query
 from fastapi.templating import Jinja2Templates
 from pymongo import MongoClient
 from starlette.responses import Response, RedirectResponse
-
 from mtbc_package import mtbc_ncbi, mtbc_tools, mtbc_tree
 from settings import mongoSettings
 import time
@@ -23,10 +19,38 @@ mongosettings = mongoSettings()
 
 templates = Jinja2Templates(directory="templates")
 logging.info("Start fastapi")
-test = FastAPI()
+
+tags_metadata = [
+    {
+        "name": "interface",
+        "description": "Go to basic html interface summarize store result",
+    },
+    {
+        "name": "users",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+    {
+        "name": "download_sra",
+        "description": "Get json file with all store information",
+    },
+    {
+        "name": "download_fasta",
+        "description": "Get fasta file alignment",
+    },
+    {
+        "name": "items",
+        "description": "Manage items. So _fancy_ they have their own docs.",
+        "externalDocs": {
+            "description": "Items external docs",
+            "url": "https://fastapi.tiangolo.com/",
+        },
+    },
+]
+
+test = FastAPI(openapi_tags=tags_metadata)
 
 
-@test.get("/")
+@test.get("/", tags=["interface"])
 async def root(request: Request):
     client = None
     try:
@@ -34,18 +58,10 @@ async def root(request: Request):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
         db_sra_list = request_data.find().distinct("_id")
-
         db_nj_tree = request_data.find({"nj_tree": {"$ne": None}}).distinct("_id")
-
         db_ml_tree = request_data.find({"ml_tree": {"$ne": None}}).distinct("_id")
-
         db_fasta = request_data.find({"fasta": {"$ne": None}}).distinct("_id")
-
         tests = request_data.find({}, {"_id": 1, "fasta": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1})
-        # for test in tests:
-        #    logging.info(test)
-        # logging.info("\n")
-
         test2 = list(tests)
         logging.debug(test2)
     finally:
@@ -57,11 +73,11 @@ async def root(request: Request):
                                        "test": test2})
 
 
-@test.get("/download_sra/{id}")
+@test.get("/download_sra/{id}", tags=["download_sra"])
 async def download_sra(id: str = ''):
     result = None
     client = None
-    if id is None:
+    if id is '':
         try:
             client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
             db_mtbc = client.db_mtbc
@@ -83,7 +99,7 @@ async def download_sra(id: str = ''):
     return result
 
 
-@test.get("/download_fasta/{id}")
+@test.get("/download_fasta/{id}", tags=["download_fasta"])
 async def download_fasta(id: Union[str, None] = None):
     result = None
     client = None
