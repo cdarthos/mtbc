@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-import os
+
 from types import SimpleNamespace
 from typing import Union, List
 
@@ -11,7 +11,7 @@ from fastapi import FastAPI, Request, Query
 from fastapi.templating import Jinja2Templates
 from pymongo import MongoClient
 from starlette.responses import Response, RedirectResponse
-from uvicorn.loops import asyncio
+
 
 from mtbc_package import mtbc_ncbi, mtbc_tools, mtbc_tree
 from settings import mongoSettings
@@ -23,34 +23,34 @@ logging.basicConfig(format=FORMAT, level=logging.INFO)
 mongosettings = mongoSettings()
 
 templates = Jinja2Templates(directory="templates")
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
 logging.info("Start fastapi")
 test = FastAPI()
 
 
 @test.get("/")
 async def root(request: Request):
-    client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
-    db_mtbc = client.db_mtbc
-    request_data = db_mtbc.request_data
-    db_sra_list = request_data.find().distinct("_id")
 
-    db_nj_tree = request_data.find({"nj_tree": {"$ne": None}}).distinct("_id")
+    try:
+        client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+        db_mtbc = client.db_mtbc
+        request_data = db_mtbc.request_data
+        db_sra_list = request_data.find().distinct("_id")
 
-    db_ml_tree = request_data.find({"ml_tree": {"$ne": None}}).distinct("_id")
+        db_nj_tree = request_data.find({"nj_tree": {"$ne": None}}).distinct("_id")
 
-    db_fasta = request_data.find({"fasta": {"$ne": None}}).distinct("_id")
+        db_ml_tree = request_data.find({"ml_tree": {"$ne": None}}).distinct("_id")
 
-    tests = request_data.find({}, {"_id": 1, "fasta": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1})
-    # for test in tests:
-    #    logging.info(test)
-    # logging.info("\n")
+        db_fasta = request_data.find({"fasta": {"$ne": None}}).distinct("_id")
 
-    test2 = list(tests)
-    logging.debug(test2)
+        tests = request_data.find({}, {"_id": 1, "fasta": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1})
+        # for test in tests:
+        #    logging.info(test)
+        # logging.info("\n")
 
-    client.close()
+        test2 = list(tests)
+        logging.debug(test2)
+    finally:
+        client.close()
     return templates.TemplateResponse("index.j2",
                                       {"request": request, "fasta": db_fasta, "nj_tree": db_nj_tree,
                                        "sra_list": db_sra_list,
@@ -58,21 +58,17 @@ async def root(request: Request):
                                        "test": test2})
 
 
-@test.get("/get_sra_list_form")
-async def get_sra_list_form(request: Request):
-    return templates.TemplateResponse("sra_list_form.j2",
-                                      {"request": request}
-                                      )
-
-
 @test.get("/download_sra/{id}")
 async def download_sra(id: str = ''):
     if id is None:
-        client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
-        db_mtbc = client.db_mtbc
-        request_data = db_mtbc.request_data
+        try:
+            client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+            db_mtbc = client.db_mtbc
+            request_data = db_mtbc.request_data
+        finally:
+            client.close()
         return request_data.find().distinct("_id")
-        client.close()
+
     
     try:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
@@ -88,7 +84,7 @@ async def download_sra(id: str = ''):
 
 
 @test.get("/download_fasta/{id}")
-async def download_fasta(id: str = ''):
+async def download_fasta(id: Union[str, None] = None):
     if id is None:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -112,7 +108,7 @@ async def download_fasta(id: str = ''):
 
 
 @test.get("/download_nj_tree/{id}")
-async def download_nj_tree(id: str = ''):
+async def download_nj_tree(id: Union[str, None] = None):
     if id is None:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -135,7 +131,7 @@ async def download_nj_tree(id: str = ''):
 
 
 @test.get("/download_ml_tree/{id}")
-async def download_ml_tree(id: str = ""):
+async def download_ml_tree(id: Union[str, None] = None):
     if id is None:
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
@@ -146,11 +142,11 @@ async def download_ml_tree(id: str = ""):
         client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
+        resultat = request_data.find_one({"_id": id})["ml_tree"]
     except:
         logging.error("error to connect mongo db")
-
-    resultat = request_data.find_one({"_id": id})["ml_tree"]
-    client.close()
+    finally:
+        client.close()
 
     response = Response(resultat, media_type='text/plain')
     response.headers["Content-Disposition"] = 'attachment; filename={0}-ml.nwk'.format(id)
@@ -162,13 +158,13 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                     select_mycobacterium_mungi: bool = False,
                     select_mycobacterium_orygis: bool = False,
                     select_mycobacterium_tuberculosis: bool = False,
-                    outgroup: str = '',
+                    #outgroup: str = '',
                     all_id_to_acc: bool = False,
 
                     email: str = 'A.N.Other@example.com',
                     snp_select: Union[List[str], None] = Query(default=None),
                     snp_reject: Union[List[str], None] = Query(default=None),
-                    raxml_parameter: Union[List[str], None] = Query(default=None),
+                    #raxml_parameter: Union[List[str], None] = Query(default=None),
                     target_list_length: int = 100
                     ):
     start_time = time.time()
@@ -177,8 +173,6 @@ async def set_param(select_mycobacterium_canettii: bool = False,
                                            select_mycobacterium_orygis=select_mycobacterium_orygis,
                                            select_mycobacterium_tuberculosis=select_mycobacterium_tuberculosis,
                                            outgroup=outgroup,
-                                           # ncbi_list_length=ncbi_list_length,
-                                           ncbi_list_length=3 * target_list_length,
                                            email=email,
                                            snp_select=snp_select,
                                            snp_reject=snp_reject,

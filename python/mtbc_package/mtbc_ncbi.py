@@ -33,7 +33,6 @@ class MtbcGetRandomSRA:
                  select_mycobacterium_orygis=False,
                  select_mycobacterium_tuberculosis=False,
                  outgroup='',
-                 ncbi_list_length=100,
                  email='A.N.Other@example.com',
                  all_id_to_acc=False,
                  target_list_length=10,
@@ -48,6 +47,9 @@ class MtbcGetRandomSRA:
         self.sample_list = None
         self.all_id_to_acc = all_id_to_acc
         self.outgroup = outgroup
+
+        if len(snp_select) > 0 or len(snp_reject) or (3 * int(target_list_length)) > 10000 :
+            self.all_id_to_acc = True
         self.ncbi_list_length = 3 * int(target_list_length)
         Entrez.email = email
         self.email = email
@@ -79,7 +81,7 @@ class MtbcGetRandomSRA:
         self.get_all_id()
         logging.info("self.ncbi_all_id")
 
-        self.select_random_ncbi_id_number()
+        #self.select_random_ncbi_id_number()
         logging.info("self.sample_list")
 
         self.acc_number_from_ncbi_id()
@@ -90,7 +92,6 @@ class MtbcGetRandomSRA:
         if True in self.select_taxa.values():
             self.ncbi_request_all_id = " OR ".join(
                 'txid' + key + '[ORGN]' for key, value in self.select_taxa.items() if value)
-
         else:
             self.ncbi_request_all_id = 'txid' + self.taxa_mycobacterium_tuberculosis_complex + '[ORGN]'
 
@@ -105,14 +106,7 @@ class MtbcGetRandomSRA:
         handle.close()
         self.ncbi_all_id = record['IdList']
 
-    def get_random_acc_list_DEV(self):
-        logging.info("get_random_acc_list_DEV")
-        shuffled_id_list = shuffle(self.ncbi_all_id)
 
-    def select_random_ncbi_id_number(self):
-        logging.info("select_random_ncbi_id_number")
-        self.ncbi_random_id_list = random.choices(self.ncbi_all_id,
-                                                  k=self.ncbi_list_length)
 
     def acc_number_from_ncbi_id(self):
         if self.all_id_to_acc:
@@ -154,7 +148,15 @@ class MtbcGetRandomSRA:
             self.ncbi_random_acc_list.append(acc_list.dropna().to_list())
         self.ncbi_random_acc_list = shuffle(self.ncbi_random_acc_list)
 
+    def select_random_ncbi_id_number(self):
+        logging.info("select_random_ncbi_id_number")
+        self.ncbi_random_id_list = random.choices(self.ncbi_all_id,
+                                                  k=self.ncbi_list_length)
+
     def limit_acc_number_from_ncbi_id(self):
+
+        self.select_random_ncbi_id_number()
+
         handle_esummary = Entrez.esummary(db="sra",
                                           id=",".join(map(str, self.ncbi_random_id_list))
                                           )
