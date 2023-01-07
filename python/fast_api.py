@@ -26,12 +26,12 @@ tags_metadata = [
         "description": "Go to basic html interface summarize store result",
     },
     {
-        "name": "users",
-        "description": "Operations with users. The **login** logic is also here.",
-    },
-    {
         "name": "download_sra",
         "description": "Get json file with all store information",
+    },
+    {
+        "name": "download_fasta",
+        "description": "Get fasta file alignment",
     },
     {
         "name": "download_fasta",
