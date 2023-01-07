@@ -92,7 +92,7 @@ class MtbcAcclistToFASTA:
                 logging.info("Nombre de SNP_reject : " + str(reject))
                 logging.info("#########################################")
                 reject += 1
-                pass
+                continue
 
             logging.info(("list of select snp : " + str(self.snp_select)))
             if check_snp_select and not any(snp in r.text for snp in self.snp_select):
@@ -101,7 +101,7 @@ class MtbcAcclistToFASTA:
                 logging.info("Nombre de SNP_not_select : " + str(not_select))
                 logging.info("#########################################")
                 not_select += 1
-                pass
+                continue
 
             index += 1
             if len(r.text) != 0:
