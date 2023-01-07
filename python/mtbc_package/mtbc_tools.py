@@ -53,11 +53,18 @@ class MtbcAcclistToFASTA:
         logging.info("mtbc_request")
         self.final_acc_list_length = 0
 
-
         ## check if snp reject
-        check_snp = False
+        check_snp_reject = False
+        check_snp_select = False
+
+        reject = 0
+        not_select = 0
+
         if len(self.snp_reject) > 0:
-            check_snp = True
+            check_snp_reject = True
+
+        if len(self.snp_select) > 0:
+            check_snp_select = True
 
         for sra in sra_list:
             if self.final_acc_list_length >= self.target_list_length:
@@ -66,7 +73,6 @@ class MtbcAcclistToFASTA:
             logging.info(str(index) + "/" + str(len(self.ncbi_random_acc_list)))
             logging.info("final")
             logging.info(str(self.final_acc_list_length) + "/" + str(self.target_list_length))
-
 
             head = {'Content-Type': 'application/x-www-form-urlencoded',
                     'Host': 'gnksoftware.synology.me:30002'}
@@ -80,11 +86,15 @@ class MtbcAcclistToFASTA:
 
             ## reject
             logging.info(("list of reject snp : " + str(self.snp_reject)))
-            if check_snp and any(snp in r.text for snp in self.snp_reject):
-                logging.info("SRA : " + str(sra)  + " is reject because contains snp_reject ")
+            if check_snp_reject and any(snp in r.text for snp in self.snp_reject):
+                logging.info("SRA : " + str(sra) + " is reject because contains snp_reject ")
                 reject += 1
                 pass
 
+            if check_snp_select and not any(snp in r.text for snp in self.snp_select):
+                logging.info("SRA : " + str(sra) + " is reject because not contains snp_select ")
+                not_select += 1
+                pass
 
             index += 1
             if len(r.text) != 0:
@@ -110,11 +120,11 @@ class MtbcAcclistToFASTA:
         logging.info("Nombre de SNP_reject : " + str(reject))
         logging.info("#########################################")
         logging.info("#########################################")
+        logging.info("Nombre de SNP_not_select : " + str(not_select))
         logging.info("#########################################")
         logging.info("#########################################")
         logging.info("#########################################")
-
-
+        logging.info("#########################################")
 
     def reconstruct_sequence_to_fasta_file(self):
 
