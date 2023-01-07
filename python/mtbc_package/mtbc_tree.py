@@ -9,7 +9,8 @@ from dendropy.interop import raxml
 
 class MtbcTree:
 
-    def create_nj_tree_static(id, fasta):
+    @staticmethod
+    def create_nj_tree_static(fasta):
         logging.info("create_nj_tree_static")
         calculator = DistanceCalculator('identity')
         handle_fasta = io.StringIO(fasta)
@@ -21,11 +22,12 @@ class MtbcTree:
         nj_tree = constructor.nj(dist_matrix)
         handle = io.StringIO()
         Phylo.write(nj_tree, handle, "newick", )
-        resultat = handle.getvalue()
+        result = handle.getvalue()
         handle.close()
-        return resultat
+        return result
 
-    def create_ml_tree_static(id, fasta):
+    @staticmethod
+    def create_ml_tree_static(fasta):
         logging.info("create_ml_tree_static")
         data = dendropy.DnaCharacterMatrix.get(
             data=fasta, schema="fasta")

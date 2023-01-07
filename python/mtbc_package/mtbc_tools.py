@@ -17,10 +17,14 @@ class MtbcAcclistToFASTA:
                  sequence_dict,
                  target_list_length,
                  final_acc_list,
-                 snp_select=[],
-                 snp_reject=[]):
+                 snp_select=None,
+                 snp_reject=None):
 
         # initial user variable
+        if snp_reject is None:
+            snp_reject = []
+        if snp_select is None:
+            snp_select = []
         self.snp_select = snp_select
         self.snp_reject = snp_reject
         self.final_acc_list_length = None
@@ -53,7 +57,7 @@ class MtbcAcclistToFASTA:
         logging.info("mtbc_request")
         self.final_acc_list_length = 0
 
-        ## check if snp reject
+        # check if snp reject
         check_snp_reject = False
         check_snp_select = False
 
@@ -85,7 +89,7 @@ class MtbcAcclistToFASTA:
             url = 'http://gnksoftware.synology.me:30002/strains/alignment'
             r = requests.post(url, parameters, head)
 
-            ## reject
+            # reject
             logging.info(("list of reject snp : " + str(self.snp_reject)))
             if check_snp_reject and any(snp in r.text for snp in self.snp_reject):
                 logging.info("#########################################")
@@ -119,8 +123,6 @@ class MtbcAcclistToFASTA:
                         if len(diff.split(":")[3]) == 1:
                             self.sequence_dict['NC_000962.3'][diff.split(":")[1]] = diff.split(":")[2]
                             self.sequence_dict[r.text[1:].split("\n")[0]][diff.split(":")[1]] = diff.split(":")[3]
-
-
 
         logging.info("#########################################")
         logging.info("#########################################")

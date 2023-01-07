@@ -1,13 +1,10 @@
-import json
 import logging
 import random
 import uuid
-# from json import JSONEncoder
 from operator import itemgetter
 import pandas as pd
 import xmltodict
 from Bio import Entrez
-from pymongo import MongoClient
 from sklearn.utils import shuffle
 
 FORMAT = "%(levelname)s:%(message)s"
@@ -36,10 +33,14 @@ class MtbcGetRandomSRA:
                  email='A.N.Other@example.com',
                  all_id_to_acc=False,
                  target_list_length=10,
-                 snp_select=[],
-                 snp_reject=[]):
+                 snp_select=None,
+                 snp_reject=None):
 
         # initial user variable
+        if snp_reject is None:
+            snp_reject = []
+        if snp_select is None:
+            snp_select = []
         self.ncbi_all_acc_list = None
         self.target_list_length = target_list_length
         self.snp_select = snp_select
@@ -48,7 +49,7 @@ class MtbcGetRandomSRA:
         self.all_id_to_acc = all_id_to_acc
         self.outgroup = outgroup
 
-        if len(snp_select) > 0 or len(snp_reject) or (3 * int(target_list_length)) > 10000 :
+        if len(snp_select) > 0 or len(snp_reject) or (3 * int(target_list_length)) > 10000:
             self.all_id_to_acc = True
         self.ncbi_list_length = 3 * int(target_list_length)
         Entrez.email = email
@@ -81,7 +82,7 @@ class MtbcGetRandomSRA:
         self.get_all_id()
         logging.info("self.ncbi_all_id")
 
-        #self.select_random_ncbi_id_number()
+        # self.select_random_ncbi_id_number()
         logging.info("self.sample_list")
 
         self.acc_number_from_ncbi_id()
@@ -106,8 +107,6 @@ class MtbcGetRandomSRA:
         handle.close()
         self.ncbi_all_id = record['IdList']
 
-
-
     def acc_number_from_ncbi_id(self):
         if self.all_id_to_acc:
             self.no_limit_acc_number_from_ncbi_id()
@@ -118,18 +117,19 @@ class MtbcGetRandomSRA:
         def generate_batch(lst, batch_size):
             for i in range(0, len(lst), batch_size):
                 yield lst[i: i + batch_size]
+
         logging.info("no_limit_acc_number_from_ncbi_id")
-        #self.ncbi_all_id
+        # self.ncbi_all_id
         all_id_len = len(self.ncbi_all_id)
         logging.info("Number of ncbi ID : " + str(all_id_len))
         batchs = generate_batch(self.ncbi_all_id, 10000)
         index = 1
-        for batch in  batchs:
+        for batch in batchs:
             logging.info("batch : " + str(index))
             index += 1
             handle_esummary = Entrez.esummary(db="sra",
-                                          id=",".join(map(str, batch))
-                                          )
+                                              id=",".join(map(str, batch))
+                                              )
             record_esummary = Entrez.read(handle_esummary)
             logging.info("record_esummary")
             logging.debug(record_esummary)
