@@ -49,7 +49,7 @@ class MtbcAcclistToFASTA:
             logging.info("if self.final_acc_list: else :")
             sra_list = self.ncbi_random_acc_list
         index = 1
-        reject = 0
+        ncbi_index = 0
         logging.info("mtbc_request")
         self.final_acc_list_length = 0
 
@@ -70,7 +70,8 @@ class MtbcAcclistToFASTA:
             if self.final_acc_list_length >= self.target_list_length:
                 return
             logging.info("ncbi")
-            logging.info(str(index) + "/" + str(len(self.ncbi_random_acc_list)))
+            ncbi_index += 1
+            logging.info(str(ncbi_index) + "/" + str(len(self.ncbi_random_acc_list)))
             logging.info("final")
             logging.info(str(self.final_acc_list_length) + "/" + str(self.target_list_length))
 
