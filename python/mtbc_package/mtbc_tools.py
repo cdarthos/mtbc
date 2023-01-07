@@ -87,12 +87,19 @@ class MtbcAcclistToFASTA:
             ## reject
             logging.info(("list of reject snp : " + str(self.snp_reject)))
             if check_snp_reject and any(snp in r.text for snp in self.snp_reject):
+                logging.info("#########################################")
                 logging.info("SRA : " + str(sra) + " is reject because contains snp_reject ")
+                logging.info("Nombre de SNP_reject : " + str(reject))
+                logging.info("#########################################")
                 reject += 1
                 pass
 
+            logging.info(("list of select snp : " + str(self.snp_select)))
             if check_snp_select and not any(snp in r.text for snp in self.snp_select):
+                logging.info("#########################################")
                 logging.info("SRA : " + str(sra) + " is reject because not contains snp_select ")
+                logging.info("Nombre de SNP_not_select : " + str(not_select))
+                logging.info("#########################################")
                 not_select += 1
                 pass
 
@@ -112,7 +119,8 @@ class MtbcAcclistToFASTA:
                             self.sequence_dict['NC_000962.3'][diff.split(":")[1]] = diff.split(":")[2]
                             self.sequence_dict[r.text[1:].split("\n")[0]][diff.split(":")[1]] = diff.split(":")[3]
 
-        logging.info("#########################################")
+
+
         logging.info("#########################################")
         logging.info("#########################################")
         logging.info("#########################################")
