@@ -100,7 +100,9 @@ class MtbcAcclistToFASTA:
                 continue
 
             logging.info(("list of select snp : " + str(self.snp_select)))
-            if check_snp_select and not all(snp in r.text for snp in self.snp_select):
+
+            ### il suffit qu'un SNP match
+            if check_snp_select and not any(snp in r.text for snp in self.snp_select):
                 logging.info("#########################################")
                 logging.info("SRA : " + str(sra) + " is reject because not contains snp_select ")
                 logging.info("Nombre de SNP_not_select : " + str(not_select))

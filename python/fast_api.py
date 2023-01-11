@@ -7,6 +7,7 @@ import uvicorn
 from fastapi import FastAPI, Request, Query
 from fastapi.templating import Jinja2Templates
 from pymongo import MongoClient
+from starlette import status
 from starlette.responses import Response, RedirectResponse
 from mtbc_package import mtbc_ncbi, mtbc_tools, mtbc_tree
 from settings import mongoSettings
@@ -22,6 +23,14 @@ logging.info("Start fastapi")
 
 tags_metadata = [
     {
+        "name": "mtbc_sra_list",
+        "description": "Select parameters",
+    },
+    {
+        "name": "id_interface",
+        "description": "Go to basic html interface summarize id result",
+    },
+    {
         "name": "interface",
         "description": "Go to basic html interface summarize store result",
     },
@@ -36,15 +45,7 @@ tags_metadata = [
     {
         "name": "download_fasta",
         "description": "Get fasta file alignment",
-    },
-    {
-        "name": "items",
-        "description": "Manage items. So _fancy_ they have their own docs.",
-        "externalDocs": {
-            "description": "Items external docs",
-            "url": "https://fastapi.tiangolo.com/",
-        },
-    },
+    }
 ]
 
 test = FastAPI(openapi_tags=tags_metadata)
@@ -71,6 +72,41 @@ async def root(request: Request):
                                        "sra_list": db_sra_list,
                                        "ml_tree": db_ml_tree,
                                        "test": test2})
+
+
+@test.get("/id/{id}", tags=["id_interface"])
+async def id_interface(id: str,request: Request):
+    try:
+        client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+        db_mtbc = client.db_mtbc
+        request_data = db_mtbc.request_data
+        result_cursor = request_data.find_one({"_id": id})
+        result = list(result_cursor)
+    except Exception:
+        logging.error("error to connect mongo db")
+    finally:
+        client.close()
+    logging.info(result)
+    logging.info(result_cursor["_id"])
+
+    fasta = False
+    if result_cursor["fasta"]  :
+        fasta = True
+    ml = False
+    if result_cursor["ml_tree"] :
+        ml = True
+    nj = False
+    if result_cursor["nj_tree"] :
+        nj = True
+
+    final_length = result_cursor["final_acc_list_length"]
+
+    logging.info(final_length)
+
+
+    return templates.TemplateResponse("id_interface.j2",
+                                      {"request": request, "id": id, "fasta": fasta, "ml": ml, "nj": nj, "final_length":final_length})
+
 
 
 @test.get("/download_sra/{id}", tags=["download_sra"])
@@ -177,7 +213,7 @@ async def download_ml_tree(id: Union[str, None] = None):
     return response
 
 
-@test.post("/mtbc_sra_list")
+@test.post("/mtbc_sra_list", tags=["mtbc_sra_list"])
 async def set_param(select_mycobacterium_canettii: bool = False,
                     select_mycobacterium_mungi: bool = False,
                     select_mycobacterium_orygis: bool = False,
@@ -219,10 +255,14 @@ async def set_param(select_mycobacterium_canettii: bool = False,
         logging.error("error to connect mongo db")
     finally:
         client.close()
-    return mtbc_inst.to_json()
+    #return mtbc_inst.to_json()
+    url = "/id/{0}".format(get_id)
+    response = RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
+    return response
 
 
 @test.get("/mtbc_fasta_align_from_json")
+@test.get("/mtbc_fasta_align_from_json/{id}")
 def fasta_align_from_json(id: str = ""):
     result = None
     client = None

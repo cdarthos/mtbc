@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Page Title</title>
-    <meta http-equiv="refresh" content="10">
+
     <style>
 
         #customers {
@@ -51,54 +51,55 @@
                 <th>ncbi size</th>
             </tr>
             </thead>
-            <tr>
-                <td>
-                    <form action="/mtbc_sra_list" method="post">
-                        <button>Get default SRA random list</button>
-                    </form>
-                </td>
-                <td>
-                    <form action="/docs#/default/set_param_mtbc_sra_list_post" method="get">
-                        <button type="submit">edit SRA random list parameter</button>
-                    </form>
-                </td>
-            </tr>
-            {% for sra in sra_list if 'request' not in sra %}
+
                 <tr>
                     <td>
-                        <a href="/id/{{ sra }}">{{ sra }}</a>
+                        <a href="/download_sra/{{ id}}">{{ id}}</a>
                     </td>
                     <td>
-                        {% if sra in fasta %}
-                            <a href="/download_fasta/{{ sra }}">{{ sra }}</a>
+                        {% if  fasta %}
+                            <a href="/download_fasta/{{ id }}">download</a>
                         {% else %}
-                            <a href="/mtbc_fasta_align_from_json?id={{ sra }}">launch</a>
+
+                            <form action="{{ '/mtbc_fasta_align_from_json/' + id  }}" method="get" target="dummyframe" onsubmit='disableButton()' onended="location.reload()">
+                                <button id='btn'>run align</button>
+                            </form>
                         {% endif %}
                     </td>
                     <td>
-                        {% if sra in nj_tree %}
-                            <a href="/download_nj_tree/{{ sra }}">{{ sra }}</a>
+                        {% if nj %}
+                            <a href="/download_nj_tree/{{ id }}">download</a>
                         {% else %}
-                            <a href="/mtbc_nj_tree_from_db/{{ sra }}">launch</a>
+                            <form action="/mtbc_nj_tree_from_db/{{ id }}" method="get" target="dummyframe" onsubmit='disableButton()'  onended="location.reload()">
+                                <button id='btn'>run nj tree</button>
+                            </form>
                         {% endif %}
                     </td>
                     <td>
-                        {% if sra in ml_tree %}
-                            <a href="/download_ml_tree/{{ sra }}">{{ sra }}</a>
+                        {% if ml %}
+                            <a href="/download_ml_tree/{{ id }}">download</a>
                         {% else %}
-                            <a href="/mtbc_ml_tree_from_db/{{ sra }}">launch</a>
+                            <form action="/mtbc_ml_tree_from_db/{{ id }}" method="get" target="dummyframe" onsubmit='disableButton()'  onended="location.reload()">
+                                <button id='btn'>run ml tree</button>
+                            </form>
                         {% endif %}
                     </td>
                     <td>
-                        {% set size = sra.split("_")[1] %}
-                        <a>{{ size }}</a>
+                        <a>{{ final_length }}</a>
                     </td>
                 </tr>
-            {% endfor %}
+
         </table>
     </div>
 
 </div>
 
 </body>
+<script>
+    function disableButton() {
+        var btn = document.getElementById('btn');
+        btn.disabled = true;
+        btn.innerText = 'Posting...'
+    }
+</script>
 </html>
