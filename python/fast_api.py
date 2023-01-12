@@ -91,9 +91,7 @@ async def test_root(request: Request):
     finally:
         client.close()
     return templates.TemplateResponse("test.j2",
-                                      {"request": request, "fasta": db_fasta, "nj_tree": db_nj_tree,
-                                       "sra_list": db_sra_list,
-                                       "ml_tree": db_ml_tree,
+                                      {"request": request,
                                        "test": tests})
 
 @test.get("/id/{id}", tags=["id_interface"])
