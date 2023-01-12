@@ -13,7 +13,9 @@ logging.basicConfig(format=FORMAT, level=logging.INFO)
 class MtbcAcclistToFASTA:
 
     def __init__(self,
-                 mtbc_get_random_sra: MtbcGetRandomSRA,
+                 #mtbc_get_random_sra: MtbcGetRandomSRA,
+                 id = id,
+                 ncbi_random_acc_list = ncbi_random_acc_list,
                  sequence_dict,
                  target_list_length,
                  final_acc_list,
@@ -30,9 +32,9 @@ class MtbcAcclistToFASTA:
         self.final_acc_list_length = None
         self.target_list_length: int = int(target_list_length)
         self.fasta = None
-        self.ncbi_random_acc_list = mtbc_get_random_sra.ncbi_random_acc_list
+        self.ncbi_random_acc_list = ncbi_random_acc_list
         self.df_mutation = None
-        self._id = mtbc_get_random_sra._id
+        self._id = id
         self.sequence_dict = sequence_dict
         self.final_acc_list: list = final_acc_list
         logging.info("len(self.sequence_dict)")
