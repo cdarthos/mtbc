@@ -65,7 +65,7 @@
                             <a href="/download_fasta/{{ id }}">download</a>
                         {% else %}
 
-                            <form action="{{ '/mtbc_fasta_align_from_json/' + id  }}" method="get" target="dummyframe" onsubmit='disableButton()' onended="location.reload()">
+                            <form action="{{ '/mtbc_fasta_align_from_json/' + id  }}" method="get" onsubmit='disableButton()' onended="location.reload()">
                                 <button id='btn'>run align</button>
                             </form>
                         {% endif %}
@@ -74,7 +74,7 @@
                         {% if nj %}
                             <a href="/download_nj_tree/{{ id }}">download</a>
                         {% else %}
-                            <form action="/mtbc_nj_tree_from_db/{{ id }}" method="get" target="dummyframe" onsubmit='disableButton()'  onended="location.reload()">
+                            <form action="/mtbc_nj_tree_from_db/{{ id }}" method="get"  onsubmit='disableButton()'  onended="location.reload()">
                                 <button id='btn'>run nj tree</button>
                             </form>
                         {% endif %}
@@ -83,7 +83,7 @@
                         {% if ml %}
                             <a href="/download_ml_tree/{{ id }}">download</a>
                         {% else %}
-                            <form action="/mtbc_ml_tree_from_db/{{ id }}" method="get" target="dummyframe" onsubmit='disableButton()'  onended="location.reload()">
+                            <form action="/mtbc_ml_tree_from_db/{{ id }}" method="get"  onsubmit='disableButton()'  onended="location.reload()">
                                 <button id='btn'>run ml tree</button>
                             </form>
                         {% endif %}
