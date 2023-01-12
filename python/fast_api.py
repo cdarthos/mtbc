@@ -319,7 +319,7 @@ def fasta_align_from_json(id: str = ""):
         client.close()
 
     start_time = time.time()
-    result_json = json.dumps(result)
+    result_json = json.dumps(result, default=str)
     result_obj = json.loads(result_json, object_hook=lambda d: SimpleNamespace(**d))
     logging.info(result_obj._id)
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(result_obj, sequence_dict=result["sequence_dict"],
