@@ -86,7 +86,7 @@ async def test_root(request: Request):
 
         tests = request_data.find({}, {"_id": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1,
                                        "create_date": 1})
-        test2 = list(tests)
+        tests = list(tests)
         logging.info(tests)
     finally:
         client.close()
