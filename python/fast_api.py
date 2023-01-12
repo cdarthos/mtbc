@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import logging
+from datetime import datetime
 from types import SimpleNamespace
 from typing import Union, List
 import uvicorn
@@ -90,7 +91,7 @@ async def id_interface(id: str,request: Request):
     logging.info(result_cursor["_id"])
 
     fasta = False
-    if result_cursor["fasta"]  :
+    if result_cursor["fasta"] :
         fasta = True
     ml = False
     if result_cursor["ml_tree"] :
@@ -100,12 +101,26 @@ async def id_interface(id: str,request: Request):
         nj = True
 
     final_length = result_cursor["final_acc_list_length"]
+    target_length = result_cursor["target_list_length"]
+    snp_select = result_cursor["snp_select"]
+    snp_reject = result_cursor["snp_reject"]
+    create_date = result_cursor["create_date"]
+
 
     logging.info(final_length)
 
 
     return templates.TemplateResponse("id_interface.j2",
-                                      {"request": request, "id": id, "fasta": fasta, "ml": ml, "nj": nj, "final_length":final_length})
+                                      {"request": request,
+                                       "id": id,
+                                       "fasta": fasta,
+                                       "ml": ml,
+                                       "nj": nj,
+                                       "final_length":final_length,
+                                       "target_length":target_length,
+                                       "snp_select":snp_select,
+                                       "snp_reject":snp_reject,
+                                       "create_date":create_date})
 
 
 
@@ -251,6 +266,7 @@ async def set_param(select_mycobacterium_canettii: bool = False,
         logging.info("get_id : " + str(get_id))
         # request_data.update_one({"_id": get_id}, {"$set": {"raxml_parameter": raxml_parameter}})
         request_data.update_one({"_id": get_id}, {"$set": {"mtbc_sra_list_time": mtbc_sra_list_time}})
+        request_data.update_one({"_id": get_id}, {"$set": {"create_date": datetime.utcnow()}})
     except Exception:
         logging.error("error to connect mongo db")
     finally:
