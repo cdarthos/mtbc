@@ -63,7 +63,8 @@ async def root(request: Request):
         db_nj_tree = request_data.find({"nj_tree": {"$ne": None}}).distinct("_id")
         db_ml_tree = request_data.find({"ml_tree": {"$ne": None}}).distinct("_id")
         db_fasta = request_data.find({"fasta": {"$ne": None}}).distinct("_id")
-        tests = request_data.find({}, {"_id": 1, "fasta": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1})
+        tests = request_data.find({}, {"_id": 1, "fasta": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1,
+                                       "create_date": 1})
         test2 = list(tests)
         logging.debug(test2)
     finally:
