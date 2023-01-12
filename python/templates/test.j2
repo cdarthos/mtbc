@@ -39,28 +39,40 @@
         <table id="customers">
             <thead>
             <tr>
-                <th>SRA_list</th>
-                <th>alignement</th>
-                <th>NJ_tree</th>
-                <th>ML_tree</th>
-                <th>ncbi size</th>
+                <th>date</th>
+                <th>id</th>
+                <th>real size</th>
+                <th>target size</th>
+                <th>select SNP</th>
+                <th>reject SNP</th>
+                <th>user email</th>
             </tr>
             </thead>
 
-
+            <tr>
+                <td>
+                    <form action="/mtbc_sra_list" method="post">
+                        <button>Get default SRA random list</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/docs#/default/set_param_mtbc_sra_list_post" method="get">
+                        <button type="submit">edit SRA random list parameter</button>
+                    </form>
+                </td>
+            </tr>
 
 {% for data in test %}
   <tr>
     <td>   
       {{ data.create_date }}
     </td>
-    <td>   
-      {{ data._id }}
+    <td>
+    <a href="/id/{{ data._id }}">{{ data._id }}</a>
     </td>
     <td>   
       {{ data.final_acc_list_length }}
-    </td>
-    
+    </td>    
     <td>   
       {{ data.target_list_length }}
     </td>
