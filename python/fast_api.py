@@ -92,7 +92,7 @@ async def test_root(request: Request):
                                        "snp_reject": 1,
                                        "email": 1})
         tests = list(tests)
-        logging.info(tests)
+        #logging.info(tests)
     finally:
         client.close()
     return templates.TemplateResponse("test.j2",
