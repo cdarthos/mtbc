@@ -322,8 +322,7 @@ def fasta_align_from_json(id: str = ""):
     result_json = json.dumps(result)
     result_obj = None
     logging.info(result_obj._id)
-    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(result_obj,
-                                               id = id,
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(id = id,
                                                ncbi_random_acc_list = result["ncbi_random_acc_list"],                                               
                                                sequence_dict=result["sequence_dict"],
                                                target_list_length=result["target_list_length"],
