@@ -129,7 +129,7 @@ async def id_interface(id: str,request: Request):
     snp_select = result_cursor["snp_select"]
     snp_reject = result_cursor["snp_reject"]
     create_date = None
-    if result_cursor["create_date"]:
+    if create_date in result_cursor:
         create_date = result_cursor["create_date"]
 
 
