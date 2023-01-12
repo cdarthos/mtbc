@@ -84,8 +84,8 @@ async def test_root(request: Request):
         db_mtbc = client.db_mtbc
         request_data = db_mtbc.request_data
 
-        tests = request_data.find({}, {"_id": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1,
-                                       "create_date": 1})
+        tests = request_data.find({}, {"_id": 1, "create_date": 1, "final_acc_list_length": 1, "target_list_length": 1,
+                                       "snp_select": 1,"snp_snp_reject": 1,"email": 1})
         tests = list(tests)
         logging.info(tests)
     finally:
