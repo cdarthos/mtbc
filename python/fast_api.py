@@ -52,7 +52,7 @@ tags_metadata = [
 test = FastAPI(openapi_tags=tags_metadata)
 
 
-@test.get("/", tags=["interface"])
+@test.get("/old")
 async def root(request: Request):
     client = None
     try:
@@ -76,7 +76,7 @@ async def root(request: Request):
                                        "test": test2})
 
 
-@test.get("/test/")
+@test.get("/", tags=["interface"])
 async def test_root(request: Request):
     client = None
     try:
