@@ -34,8 +34,7 @@ class MtbcGetRandomSRA:
                  all_id_to_acc=False,
                  target_list_length=10,
                  snp_select=None,
-                 snp_reject=None,
-                 max_sra_length = 50000):
+                 snp_reject=None):
 
         # initial user variable
         if snp_reject is None:
@@ -55,7 +54,7 @@ class MtbcGetRandomSRA:
         self.ncbi_list_length = 3 * int(target_list_length)
         Entrez.email = email
         self.email = email
-        self.max_sra_length = max_sra_length
+
         self.select_taxa = {self.taxa_mycobacterium_canettii: select_mycobacterium_canettii,
                             self.taxa_mycobacterium_mungi: select_mycobacterium_mungi,
                             self.taxa_mycobacterium_orygis: select_mycobacterium_orygis,
@@ -151,12 +150,13 @@ class MtbcGetRandomSRA:
             acc_list = pd.json_normalize(runs_acc)['root.Run.@acc']
 
             self.ncbi_random_acc_list.append(acc_list.dropna())
-        self.ncbi_random_acc_list = shuffle(random.choices(self.ncbi_random_acc_list, k=self.max_sra_length))
+            logging.info(self.ncbi_random_acc_list)
+        self.ncbi_random_acc_list = shuffle(self.ncbi_random_acc_list)
 
     def select_random_ncbi_id_number(self):
         logging.info("select_random_ncbi_id_number")
-        self.ncbi_random_id_list = shuffle(random.choices(self.ncbi_all_id,
-                                                  k=self.ncbi_list_length))
+        self.ncbi_random_id_list = random.choices(self.ncbi_all_id,
+                                                  k=self.ncbi_list_length)
 
     def limit_acc_number_from_ncbi_id(self):
 
