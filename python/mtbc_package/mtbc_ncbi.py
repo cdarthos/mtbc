@@ -130,7 +130,11 @@ class MtbcGetRandomSRA:
             handle_esummary = Entrez.esummary(db="sra",
                                               id=",".join(map(str, batch))
                                               )
-            record_esummary = Entrez.read(handle_esummary)
+            try:
+                record_esummary = Entrez.read(handle_esummary)
+            except Exception as e :
+                logging.error("record_esummary = Entrez.read(handle_esummary)")
+                logging.error(e)
             logging.info("record_esummary")
             logging.debug(record_esummary)
             handle_esummary.close()
