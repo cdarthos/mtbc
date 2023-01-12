@@ -293,8 +293,9 @@ async def set_param(select_mycobacterium_canettii: bool = False,
         # request_data.update_one({"_id": get_id}, {"$set": {"raxml_parameter": raxml_parameter}})
         request_data.update_one({"_id": get_id}, {"$set": {"mtbc_sra_list_time": mtbc_sra_list_time}})
         request_data.update_one({"_id": get_id}, {"$set": {"create_date": datetime.utcnow()}})
-    except Exception:
+    except Exception as e:
         logging.error("error to connect mongo db")
+        logging.error(e)
     finally:
         client.close()
     #return mtbc_inst.to_json()
