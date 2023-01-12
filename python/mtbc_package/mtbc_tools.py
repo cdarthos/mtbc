@@ -14,8 +14,8 @@ class MtbcAcclistToFASTA:
 
     def __init__(self,
                  #mtbc_get_random_sra: MtbcGetRandomSRA,
-                 id = id,
-                 ncbi_random_acc_list = ncbi_random_acc_list,
+                 id,
+                 ncbi_random_acc_list,
                  sequence_dict,
                  target_list_length,
                  final_acc_list,
