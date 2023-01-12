@@ -150,7 +150,7 @@ class MtbcGetRandomSRA:
             acc_list = pd.json_normalize(runs_acc)['root.Run.@acc']
 
             self.ncbi_random_acc_list.append(acc_list.dropna())
-            logging.info(self.ncbi_random_acc_list)
+            logging.info(list(self.ncbi_random_acc_list))
         self.ncbi_random_acc_list = shuffle(self.ncbi_random_acc_list)
 
     def select_random_ncbi_id_number(self):
