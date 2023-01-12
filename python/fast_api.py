@@ -319,9 +319,9 @@ def fasta_align_from_json(id: str = ""):
         client.close()
 
     start_time = time.time()
-    result_json = json.dumps(result)
-    result_obj = None
-    logging.info(result_obj._id)
+    #result_json = json.dumps(result)
+    #result_obj = None
+    #logging.info(result_obj._id)
     mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(id = id,
                                                ncbi_random_acc_list = result["ncbi_random_acc_list"],                                               
                                                sequence_dict=result["sequence_dict"],
