@@ -128,7 +128,9 @@ async def id_interface(id: str,request: Request):
     target_length = result_cursor["target_list_length"]
     snp_select = result_cursor["snp_select"]
     snp_reject = result_cursor["snp_reject"]
-    create_date = result_cursor["create_date"]
+    create_date = None
+    if create_date = result_cursor["create_date"]:
+        create_date = result_cursor["create_date"]
 
 
     logging.info(final_length)
