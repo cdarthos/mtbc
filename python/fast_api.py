@@ -76,6 +76,26 @@ async def root(request: Request):
                                        "test": test2})
 
 
+@test.get("/test/")
+async def test_root(request: Request):
+    client = None
+    try:
+        client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+        db_mtbc = client.db_mtbc
+        request_data = db_mtbc.request_data
+
+        tests = request_data.find({}, {"_id": 1, "nj_tree": 1, "ml_tree": 1, "final_acc_list_length": 1,
+                                       "create_date": 1})
+        test2 = list(tests)
+        logging.debug(test2)
+    finally:
+        client.close()
+    return templates.TemplateResponse("test.j2",
+                                      {"request": request, "fasta": db_fasta, "nj_tree": db_nj_tree,
+                                       "sra_list": db_sra_list,
+                                       "ml_tree": db_ml_tree,
+                                       "test": tests})
+
 @test.get("/id/{id}", tags=["id_interface"])
 async def id_interface(id: str,request: Request):
     try:
