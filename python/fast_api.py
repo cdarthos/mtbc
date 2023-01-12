@@ -52,7 +52,7 @@ tags_metadata = [
 test = FastAPI(openapi_tags=tags_metadata)
 
 
-@test.get("/", tags=["interface"])
+@test.get("/old")
 async def root(request: Request):
     client = None
     try:
@@ -75,6 +75,29 @@ async def root(request: Request):
                                        "ml_tree": db_ml_tree,
                                        "test": test2})
 
+
+@test.get("/", tags=["interface"])
+async def test_root(request: Request):
+    client = None
+    try:
+        client = MongoClient('mongodb://{0}:{1}/'.format(mongosettings.host, mongosettings.port))
+        db_mtbc = client.db_mtbc
+        request_data = db_mtbc.request_data
+
+        tests = request_data.find({}, {"_id": 1,
+                                       "create_date": 1,
+                                       "final_acc_list_length": 1,
+                                       "target_list_length": 1,                                       
+                                       "snp_select": 1,
+                                       "snp_reject": 1,
+                                       "email": 1})
+        tests = list(tests)
+        logging.info(tests)
+    finally:
+        client.close()
+    return templates.TemplateResponse("test.j2",
+                                      {"request": request,
+                                       "test": tests})
 
 @test.get("/id/{id}", tags=["id_interface"])
 async def id_interface(id: str,request: Request):
@@ -105,7 +128,9 @@ async def id_interface(id: str,request: Request):
     target_length = result_cursor["target_list_length"]
     snp_select = result_cursor["snp_select"]
     snp_reject = result_cursor["snp_reject"]
-    create_date = result_cursor["create_date"]
+    create_date = None
+    if create_date in result_cursor:
+        create_date = result_cursor["create_date"]
 
 
     logging.info(final_length)
@@ -294,10 +319,12 @@ def fasta_align_from_json(id: str = ""):
         client.close()
 
     start_time = time.time()
-    result_json = json.dumps(result)
-    result_obj = json.loads(result_json, object_hook=lambda d: SimpleNamespace(**d))
-    logging.info(result_obj._id)
-    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(result_obj, sequence_dict=result["sequence_dict"],
+    #result_json = json.dumps(result)
+    #result_obj = None
+    #logging.info(result_obj._id)
+    mtbc_fasta = mtbc_tools.MtbcAcclistToFASTA(id = id,
+                                               ncbi_random_acc_list = result["ncbi_random_acc_list"],                                               
+                                               sequence_dict=result["sequence_dict"],
                                                target_list_length=result["target_list_length"],
                                                final_acc_list=result["final_acc_list"],
                                                snp_reject=result["snp_reject"],
