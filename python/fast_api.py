@@ -373,7 +373,7 @@ def fasta_align_from_json(id: str = ""):
     return response
 
 
-@test.get("/mtbc_nj_tree_from_db/{id}")
+@test.get("/mtbc_nj_tree_from_db/{id}", status_code=status.HTTP_205_RESET_CONTENT)
 async def nj_tree_from_db(id: str = ""):
     client = None
     fasta = None
